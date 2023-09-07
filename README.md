@@ -8,8 +8,8 @@ Load shared lib:
 
 
 
-Compile in MacOs:
+Compile in MacOs ¿¿¿???:
 `gcc -shared -o malloc_tester.dylib malloc_tester.c`
 
-Load shared DyLib:
+Load shared DyLib ¿¿¿???:
 `DYLD_INSERT_LIBRARIES=./malloc_tester.dylib ./Your_Program`
