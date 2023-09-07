@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# Función para mostrar el mensaje de bienvenida
 show_welcome_message() {
 	
 echo " _    _                                _    ";
@@ -23,7 +22,7 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
   LOAD_FUNCTION="LD_PRELOAD"
 elif [[ "$OSTYPE" == "darwin"* ]]; then
   # MacOS
-  REMOTE_LIBRARY_URL="https://github.com/kingcreek/42-Malloc_tester/raw/main/malloc_tester.dylib"
+  REMOTE_LIBRARY_URL="https://github.com/kingcreek/42-Malloc_tester/raw/main/malloc_tester.dylib?raw=true"
   LOCAL_LIBRARY_NAME="malloc_tester.dylib"
   LOAD_FUNCTION="DYLD_INSERT_LIBRARIES"
 else
@@ -32,7 +31,7 @@ else
 fi
 
 echo "Descargando la biblioteca compartida desde $REMOTE_LIBRARY_URL..."
-curl -o $LOCAL_LIBRARY_NAME $REMOTE_LIBRARY_URL
+curl -L -o $LOCAL_LIBRARY_NAME $REMOTE_LIBRARY_URL
 
 if [ $? -ne 0 ]; then
   echo "Error al descargar la biblioteca compartida."
@@ -43,12 +42,13 @@ read -p "Ingrese la ruta del ejecutable: " EXECUTABLE_PATH
 
 if [ ! -f "$EXECUTABLE_PATH" ]; then
   echo "El ejecutable no existe en la ubicación especificada."
+  rm -f $LOCAL_LIBRARY_NAME
   exit 1
 fi
 
 echo "Ejecutando $EXECUTABLE_PATH con la biblioteca $LOCAL_LIBRARY_NAME cargada..."
 $LOAD_FUNCTION=./$LOCAL_LIBRARY_NAME $EXECUTABLE_PATH
 
-#rm -f $LOCAL_LIBRARY_NAME
+rm -f $LOCAL_LIBRARY_NAME
 
 echo "Ejecución completa."
