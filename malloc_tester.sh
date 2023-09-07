@@ -18,13 +18,13 @@ show_welcome_message
 # Detectar si el sistema operativo es Linux o macOS
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
   # Sistema Linux
-  REMOTE_LIBRARY_URL="http://tu.url.remota/mymalloc_linux.so"
-  LOCAL_LIBRARY_NAME="mymalloc_linux.so"
+  REMOTE_LIBRARY_URL="https://github.com/kingcreek/42-Malloc_tester/blob/main/malloc_tester.so"
+  LOCAL_LIBRARY_NAME="malloc_tester.so"
   LOAD_FUNCTION="LD_PRELOAD"
 elif [[ "$OSTYPE" == "darwin"* ]]; then
   # macOS
-  REMOTE_LIBRARY_URL="http://tu.url.remota/mymalloc_macos.dylib"
-  LOCAL_LIBRARY_NAME="mymalloc_macos.dylib"
+  REMOTE_LIBRARY_URL="https://github.com/kingcreek/42-Malloc_tester/blob/main/malloc_tester.dylib"
+  LOCAL_LIBRARY_NAME="malloc_tester.dylib"
   LOAD_FUNCTION="DYLD_INSERT_LIBRARIES"
 else
   echo "Sistema operativo no compatible."
