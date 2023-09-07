@@ -6,7 +6,7 @@
 static void* (*real_malloc)(size_t size);
 static void  (*real_free)(void *ptr);
 
-static bool simulate_malloc_failure = false;
+static bool simulate_malloc_failure = true;
 
 __attribute__((constructor))
 static void init()
@@ -18,15 +18,20 @@ static void init()
 
 void *malloc(size_t size)
 {
+	return NULL;
+	/*
     if (simulate_malloc_failure) {
         fprintf(stderr, "Simulate malloc failure? (y/n): ");
         char response;
         scanf(" %c", &response);
+        getchar();  // Consume el carácter de salto de línea adicional
+
         if (response == 'y' || response == 'Y') {
             fprintf(stderr, "Simulated malloc failure\n");
             return NULL;
         }
     }
+	*/
 
     void *ptr = real_malloc(size);
     //fprintf(stderr, "malloc(%zd) = %p\n", size, ptr);
