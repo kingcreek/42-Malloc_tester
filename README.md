@@ -14,6 +14,3 @@ Compile in MacOs:
 Load shared DyLib:
 `DYLD_INSERT_LIBRARIES=./malloc_tester.dylib ./Your_Program`
 
-
-# BONUS
-wtf? https://dogbolt.org/
