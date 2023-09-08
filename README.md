@@ -1,7 +1,7 @@
 # 42-Malloc_tester
  
 Compile in Linux:
-`gcc -shared -fPIC -o malloc_tester.so malloc_tester.c`
+`gcc -shared -fPIC malloc_tester.c -o malloc_tester.so`
 
 Load shared lib:
 `LD_PRELOAD=./malloc_tester.so ./Your_Program`
@@ -9,7 +9,11 @@ Load shared lib:
 
 
 Compile in MacOs:
-`gcc -shared -o malloc_tester.dylib malloc_tester.c`
+`gcc -dynamiclib malloc_tester.c -o malloc_tester.dylib`
 
 Load shared DyLib:
 `DYLD_INSERT_LIBRARIES=./malloc_tester.dylib ./Your_Program`
+
+
+# BONUS
+wtf? https://dogbolt.org/
