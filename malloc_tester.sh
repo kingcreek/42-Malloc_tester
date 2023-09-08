@@ -40,15 +40,15 @@ if [ -n "$BASH_VERSION" ]; then
 fi
 
 echo "Descargando la biblioteca compartida desde $REMOTE_LIBRARY_URL..."
-#curl -L -o $LOCAL_LIBRARY_NAME $REMOTE_LIBRARY_URL
+curl -L -o $LOCAL_LIBRARY_NAME $REMOTE_LIBRARY_URL
 
 if [ $? -ne 0 ]; then
   echo "Error al descargar la biblioteca compartida."
   exit 1
 fi
 
-#read -p "Ingrese la ruta del ejecutable: " EXECUTABLE_PATH
-EXECUTABLE_PATH="./fractol Mandelbrot"
+read -p "Ingrese la ruta del ejecutable: " EXECUTABLE_PATH
+#EXECUTABLE_PATH="./fractol Mandelbrot"
 EJECUTABLE=$(echo "$EXECUTABLE_PATH" | awk '{print $1}')
 if [ ! -f "$EJECUTABLE" ]; then
   echo "El ejecutable no existe en la ubicación especificada."
