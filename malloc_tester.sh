@@ -40,7 +40,7 @@ if [ -n "$BASH_VERSION" ]; then
 fi
 
 echo "Descargando la biblioteca compartida desde $REMOTE_LIBRARY_URL..."
-curl -L -o $LOCAL_LIBRARY_NAME $REMOTE_LIBRARY_URL
+#curl -L -o $LOCAL_LIBRARY_NAME $REMOTE_LIBRARY_URL
 
 if [ $? -ne 0 ]; then
   echo "Error al descargar la biblioteca compartida."

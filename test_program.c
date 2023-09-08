@@ -36,10 +36,10 @@ int main()
 	str[1] = '\0';
 	free(str);
 
-	char **test = malloc(50);
+	char **test = malloc(5);
 	if(!test)
 		exit(0);
-	for (int i = 0; i < 49; i++)
+	for (int i = 0; i < 4; i++)
 	{
 		char *a = malloc(2);
 		test[i] = a;

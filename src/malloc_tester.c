@@ -6,7 +6,7 @@
 /*   By: imurugar <imurugar@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/08 10:12:07 by imurugar          #+#    #+#             */
-/*   Updated: 2023/09/08 13:30:53 by imurugar         ###   ########.fr       */
+/*   Updated: 2023/09/08 13:51:34 by imurugar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,16 +41,36 @@ static void unlock_mutex_malloc() { ignore_malloc = 0; }
 
 void program_finish()
 {
+	/*
 	lock_mutex_malloc();
-	fprintf(stdout, "program finish!\n");
+	//Program finish without free all memory, posible exit(0) or leaks
+	if (allocated_bytes >= freed_bytes)
+	{
+		fprintf(stdout, "program finish leaks?\n");
+		clean_exit = 0;
+		int file = open("repeater", O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR);
+		close(file);
+	}
+	else
+	{
+		fprintf(stdout, "program finish!\n");
+		//maybe a clean exit
+		remove("repeater");
+	}
+	unlock_mutex_malloc();
+	*/
+	
+	lock_mutex_malloc();
+	fprintf(stdout, "program finish atexit\n");
 	if (clean_exit)
 		remove("repeater");
 	unlock_mutex_malloc();
+	
 }
 
 __attribute__((constructor)) static void init()
 {
-	//atexit(program_finish);
+	atexit(program_finish);
 	// signal(SIGINT, handler); //SIGSEGV
 	fprintf(stderr, "malloc tester init.\n");
 	clean_exit = 1;
@@ -62,6 +82,7 @@ __attribute__((constructor)) static void init()
 
 INTERPOSE_C_VOID(exit, (int status), (status))
 {
+	/*
 	lock_mutex_malloc();
 	//Program finish without free all memory, posible exit(0) or leaks
 	if (allocated_bytes >= freed_bytes)
@@ -73,12 +94,19 @@ INTERPOSE_C_VOID(exit, (int status), (status))
 	}
 	else
 	{
+		fprintf(stdout, "program finish in exit!\n");
 		//maybe a clean exit
 		remove("repeater");
 	}
 	unlock_mutex_malloc();
-	
-	
+	Real__exit(status);
+	*/
+	lock_mutex_malloc();
+	clean_exit = 0;
+	fprintf(stderr, "Program finish in exit(%d) function\n", status);
+	int file = open("repeater", O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR);
+	close(file);
+	unlock_mutex_malloc();
 	Real__exit(status);
 }
 
@@ -176,38 +204,3 @@ __attribute__((used)) static struct { const void *replacement; const void *repla
 __attribute__ ((section ("__DATA,__interpose"))) = { (const void *)(unsigned long)&my_printf, (const void *)(unsigned long)&printf };
 
 */
-int save_call_nbr(const char *filename, int nbr)
-{
-	int fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
-
-	if (fd == -1)
-		return (0);
-
-	ssize_t bytes_written = write(fd, &nbr, sizeof(int));
-	if (bytes_written != sizeof(int))
-	{
-		close(fd);
-		return (0);
-	}
-
-	close(fd);
-	return 1;
-}
-
-int get_call_nbr(const char *filename)
-{
-	int fd = open(filename, O_RDONLY);
-	int nbr;
-
-	if (fd == -1)
-		return (-1);
-
-	ssize_t bytes_read = read(fd, &nbr, sizeof(int));
-	if (bytes_read != sizeof(int))
-	{
-		close(fd);
-		return (-1);
-	}
-	close(fd);
-	return nbr;
-}
