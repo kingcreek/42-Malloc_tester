@@ -40,7 +40,7 @@ if [ -n "$BASH_VERSION" ]; then
 fi
 
 echo "Descargando la biblioteca compartida desde $REMOTE_LIBRARY_URL..."
-curl -L -o $LOCAL_LIBRARY_NAME $REMOTE_LIBRARY_URL
+#curl -L -o $LOCAL_LIBRARY_NAME $REMOTE_LIBRARY_URL
 
 if [ $? -ne 0 ]; then
   echo "Error al descargar la biblioteca compartida."
@@ -48,8 +48,9 @@ if [ $? -ne 0 ]; then
 fi
 
 #read -p "Ingrese la ruta del ejecutable: " EXECUTABLE_PATH
-EXECUTABLE_PATH="./a.out"
-if [ ! -f "$EXECUTABLE_PATH" ]; then
+EXECUTABLE_PATH="./fractol Mandelbrot"
+EJECUTABLE=$(echo "$EXECUTABLE_PATH" | awk '{print $1}')
+if [ ! -f "$EJECUTABLE" ]; then
   echo "El ejecutable no existe en la ubicación especificada."
   rm -f $LOCAL_LIBRARY_NAME
   exit 1
@@ -63,8 +64,10 @@ echo "Ejecutando $EXECUTABLE_PATH con la biblioteca $LOCAL_LIBRARY_NAME cargada.
 ok_flag=0
 
 while true; do
-  program_output=$(LD_PRELOAD=$(readlink -f ./$LOCAL_LIBRARY_NAME) $EXECUTABLE_PATH 2>&1)
+  program_output=$(LD_PRELOAD=$(readlink -f ./$LOCAL_LIBRARY_NAME) $EXECUTABLE_PATH) # 2>&1)
   program_result=$?
+
+  echo $program_output
 
 
   #if [ "$program_output" == *"Segmentation fault"* ]; then

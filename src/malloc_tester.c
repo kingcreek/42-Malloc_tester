@@ -1,24 +1,29 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   malloc_tester.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: imurugar <imurugar@student.42madrid.com    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/09/08 10:12:07 by imurugar          #+#    #+#             */
+/*   Updated: 2023/09/08 10:41:45 by imurugar         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #define _GNU_SOURCE
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <execinfo.h>
-#include <unistd.h>
-#include <string.h>
-#include <fcntl.h>
-#include "interpose.h"
+#include "../inc/malloc_tester.h"
+#include "../inc/interpose.h"
 
-#define MAX_CALLSTACK_SIZE 10
+#define MAX_CALLSTACK_SIZE 255
 void *callstack[MAX_CALLSTACK_SIZE];
 
 const char *filename = "address.0x00";
 const char direccionString[20];
 int call_nbr;
 int clean_exit;
-int ignore_malloc; // This is called a mutex complex.
+int ignore_malloc;
 
-int save_call_nbr(const char *filename, int nbr);
-int get_call_nbr(const char *filename);
 
 void handler(int sig)
 {
@@ -29,15 +34,9 @@ void handler(int sig)
 	exit(0);
 }
 
-static void lock_mutex_malloc()
-{
-	ignore_malloc = 1;
-}
+static void lock_mutex_malloc() { ignore_malloc = 1; }
 
-static void unlock_mutex_malloc()
-{
-	ignore_malloc = 0;
-}
+static void unlock_mutex_malloc() { ignore_malloc = 0; }
 
 void program_finish()
 {
@@ -51,7 +50,7 @@ void program_finish()
 __attribute__((constructor)) static void init()
 {
 	atexit(program_finish);
-	// signal(SIGINT, handler); //SIGSEGV
+	//signal(SIGINT, handler); //SIGSEGV
 	fprintf(stderr, "malloc tester init.\n");
 	clean_exit = 1;
 	ignore_malloc = 0;
@@ -79,10 +78,11 @@ INTERPOSE_C_VOID(exit, (int status), (status))
 
 INTERPOSE_C(void *, malloc, (size_t sz), (sz))
 {
+
 	if (ignore_malloc == 0)
 	{
 		static int currentFunctionCall = 0;
-		fprintf(stderr, "Malloc called\n");
+		//fprintf(stderr, "Malloc called\n");
 		// Interactive
 		/*
 		fflush(stdout);
@@ -101,43 +101,52 @@ INTERPOSE_C(void *, malloc, (size_t sz), (sz))
 		*/
 	
 		// Skip previus function calls
-		if (currentFunctionCall < call_nbr)
-			return (currentFunctionCall++, Real__malloc(sz));
+		//if (currentFunctionCall < call_nbr)
+		//	return (currentFunctionCall++, Real__malloc(sz));
 		// save call number in file
-		lock_mutex_malloc();
-		save_call_nbr(filename, ++call_nbr);
-		unlock_mutex_malloc();
-		currentFunctionCall++;
-		return NULL;
-		// return Real__malloc(sz);
+		//lock_mutex_malloc();
+		//save_call_nbr(filename, ++call_nbr);
+		//unlock_mutex_malloc();
+		//currentFunctionCall++;
+		//return NULL;
 
-		/*
+		lock_mutex_malloc();
 		// Obtener la ruta de la funcion de quien ha invocado
 		void *caller = NULL;
 		// Obtener una traza de la pila de llamadas
 		int frames = backtrace(callstack, sizeof(callstack) / sizeof(callstack[0]));
 		if (frames <= 0)
 		{
-			fprintf(stderr, "No se pudo obtener la traza de llamadas.\n");
+			unlock_mutex_malloc();
 			return Real__malloc(sz);
 		}
 		caller = callstack[1];
+
+		//fprintf(stderr, "hooked %d frames, try alloc %zu\n", frames, sz);
+		//fprintf(stderr, "Intento de crash! %p jijiji\n", caller);
+
 		if (caller < (void *)0x7f0000000000)
 		{
-			fprintf(stderr, "hooked %d frames, try alloc %zu\n", frames, sz);
-			fprintf(stderr, "Intento de crash! %p jijiji\n", caller);
-
-			addr_to_str(caller, direccionString, sizeof(direccionString));
-			if (!find_addr(filename, direccionString))
-			{
-				save_addr(filename, direccionString);
-				//return NULL;
+			//get_trace();
+			//void *callstack[128];
+			//int frames = backtrace(callstack, 128);
+			//backtrace_symbols_fd(callstack, frames, STDOUT_FILENO);
+			
+			if (currentFunctionCall < call_nbr) {
+				currentFunctionCall++;
+				return Real__malloc(sz);
 			}
+			fprintf(stderr, "hooked %d frames, try alloc %zu\n", frames, sz);
+			fprintf(stderr, "Try crash in! %p\n", caller);
+			// save call number in file
+			save_call_nbr(filename, ++call_nbr);
+			currentFunctionCall++;
+			unlock_mutex_malloc();
+			return NULL;
 		}
-		fprintf(stderr, "Caught a call to malloc(%zu)\n", sz);
-
-		return Real__malloc(sz);
-		*/
+		//fprintf(stderr, "Caught a call to malloc(%zu)\n", sz);
+		unlock_mutex_malloc();
+		
 	}
 	return Real__malloc(sz);
 }

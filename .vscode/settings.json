@@ -1,0 +1,6 @@
+{
+	"files.associations": {
+		"malloc_tester.h": "c",
+		"array": "c"
+	}
+}
