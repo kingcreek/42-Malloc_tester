@@ -6,7 +6,7 @@
 /*   By: imurugar <imurugar@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/08 10:12:50 by imurugar          #+#    #+#             */
-/*   Updated: 2023/09/08 10:26:17 by imurugar         ###   ########.fr       */
+/*   Updated: 2023/09/08 13:20:13 by imurugar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,12 @@
 #include <string.h>
 #include <fcntl.h>
 #include <sys/wait.h>
+#if defined(__APPLE__)
+#include <malloc/malloc.h>
+#define malloc_usable_size malloc_size
+#elif defined(__ELF__)
+#include <malloc.h>
+#endif
 
 int save_call_nbr(const char *filename, int nbr);
 int get_call_nbr(const char *filename);

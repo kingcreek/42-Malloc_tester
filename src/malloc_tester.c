@@ -6,7 +6,7 @@
 /*   By: imurugar <imurugar@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/08 10:12:07 by imurugar          #+#    #+#             */
-/*   Updated: 2023/09/08 10:41:45 by imurugar         ###   ########.fr       */
+/*   Updated: 2023/09/08 13:30:53 by imurugar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,8 @@ const char direccionString[20];
 int call_nbr;
 int clean_exit;
 int ignore_malloc;
-
+size_t allocated_bytes = 0;
+size_t freed_bytes = 0;
 
 void handler(int sig)
 {
@@ -49,8 +50,8 @@ void program_finish()
 
 __attribute__((constructor)) static void init()
 {
-	atexit(program_finish);
-	//signal(SIGINT, handler); //SIGSEGV
+	//atexit(program_finish);
+	// signal(SIGINT, handler); //SIGSEGV
 	fprintf(stderr, "malloc tester init.\n");
 	clean_exit = 1;
 	ignore_malloc = 0;
@@ -61,17 +62,24 @@ __attribute__((constructor)) static void init()
 
 INTERPOSE_C_VOID(exit, (int status), (status))
 {
-	
 	lock_mutex_malloc();
-	clean_exit = 0;
-	fprintf(stderr, "Program exit in exit(%d) function\n", status);
-	int file = open("repeater", O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR);
-	close(file);
+	//Program finish without free all memory, posible exit(0) or leaks
+	if (allocated_bytes >= freed_bytes)
+	{
+		clean_exit = 0;
+		fprintf(stderr, "Program exit in exit(%d) function\n", status);
+		int file = open("repeater", O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR);
+		close(file);
+	}
+	else
+	{
+		//maybe a clean exit
+		remove("repeater");
+	}
 	unlock_mutex_malloc();
 	
+	
 	Real__exit(status);
-
-	// return;
 }
 
 #define PRINT_CALLER() fprintf(stderr, "Caller function: %s\n", __PRETTY_FUNCTION__)
@@ -82,8 +90,8 @@ INTERPOSE_C(void *, malloc, (size_t sz), (sz))
 	if (ignore_malloc == 0)
 	{
 		static int currentFunctionCall = 0;
-		//fprintf(stderr, "Malloc called\n");
-		// Interactive
+		// fprintf(stderr, "Malloc called\n");
+		//  Interactive
 		/*
 		fflush(stdout);
 		fprintf(stderr, "Malloc detected, try crash? y/n\n");
@@ -99,56 +107,54 @@ INTERPOSE_C(void *, malloc, (size_t sz), (sz))
 		}
 		return Real__malloc(sz);
 		*/
-	
-		// Skip previus function calls
-		//if (currentFunctionCall < call_nbr)
-		//	return (currentFunctionCall++, Real__malloc(sz));
-		// save call number in file
-		//lock_mutex_malloc();
-		//save_call_nbr(filename, ++call_nbr);
-		//unlock_mutex_malloc();
-		//currentFunctionCall++;
-		//return NULL;
 
 		lock_mutex_malloc();
-		// Obtener la ruta de la funcion de quien ha invocado
 		void *caller = NULL;
-		// Obtener una traza de la pila de llamadas
 		int frames = backtrace(callstack, sizeof(callstack) / sizeof(callstack[0]));
 		if (frames <= 0)
 		{
 			unlock_mutex_malloc();
-			return Real__malloc(sz);
+			void *result = Real__malloc(sz);
+			allocated_bytes += malloc_usable_size(result);
+			return result;
 		}
 		caller = callstack[1];
 
-		//fprintf(stderr, "hooked %d frames, try alloc %zu\n", frames, sz);
-		//fprintf(stderr, "Intento de crash! %p jijiji\n", caller);
-
 		if (caller < (void *)0x7f0000000000)
 		{
-			//get_trace();
-			//void *callstack[128];
-			//int frames = backtrace(callstack, 128);
-			//backtrace_symbols_fd(callstack, frames, STDOUT_FILENO);
-			
-			if (currentFunctionCall < call_nbr) {
+			// get_trace();
+			//  Skip previus malloc function calls
+			if (currentFunctionCall < call_nbr)
+			{
 				currentFunctionCall++;
-				return Real__malloc(sz);
+				void *result = Real__malloc(sz);
+				allocated_bytes += malloc_usable_size(result);
+				return result;
 			}
-			fprintf(stderr, "hooked %d frames, try alloc %zu\n", frames, sz);
-			fprintf(stderr, "Try crash in! %p\n", caller);
-			// save call number in file
+			// fprintf(stderr, "hooked %d frames, try alloc %zu\n", frames, sz);
+			// fprintf(stderr, "Try crash in! %p\n", caller);
+			//  save call number in file
 			save_call_nbr(filename, ++call_nbr);
 			currentFunctionCall++;
+			//perform malloc only for storage memory requested
+			void *result = Real__malloc(sz);
+			allocated_bytes += malloc_usable_size(result);
+			free(result);
 			unlock_mutex_malloc();
 			return NULL;
 		}
-		//fprintf(stderr, "Caught a call to malloc(%zu)\n", sz);
+		// fprintf(stderr, "Caught a call to malloc(%zu)\n", sz);
 		unlock_mutex_malloc();
-		
 	}
-	return Real__malloc(sz);
+	void *result = Real__malloc(sz);
+	allocated_bytes += malloc_usable_size(result);
+	return result;
+}
+
+INTERPOSE_C_VOID(free, (void *p), (p))
+{
+	freed_bytes += malloc_usable_size(p);
+	Real__free(p);
 }
 
 /*
