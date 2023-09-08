@@ -31,10 +31,20 @@ int main()
 	}
 	
 	str = malloc(1338);
-	/*if(str)
-		return (0);*/
+	if(!str)
+		exit (0);
 	str[1] = '\0';
 	free(str);
+
+	char **test = malloc(50);
+	if(!test)
+		exit(0);
+	for (int i = 0; i < 49; i++)
+	{
+		char *a = malloc(2);
+		test[i] = a;
+	}
+	test[20][1] = '\0';
 	
 	
 	return 0;
