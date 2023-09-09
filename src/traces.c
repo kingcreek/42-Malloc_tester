@@ -6,48 +6,89 @@
 /*   By: imurugar <imurugar@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/08 10:12:02 by imurugar          #+#    #+#             */
-/*   Updated: 2023/09/08 10:30:52 by imurugar         ###   ########.fr       */
+/*   Updated: 2023/09/09 13:17:54 by imurugar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/malloc_tester.h"
 
-void get_function_names(void *address[], int addrNumb) {
-    int i;
-    char addr2line_cmd[1024];
+// atos -o ./a.out -l 0x7fff5fc00000 - macOs ¿need relative or absolute addr? i dont know, u_u, try 
+// addr2line -e ./a.out + 0x1224 - linux
 
-    for (i = 0; i < addrNumb; i++) {
-        sprintf(addr2line_cmd, "addr2line -e ./fractol %p", address[i]);
-        fflush(stdout);
-        fprintf(stderr, "Dirección %d: %p\n", i, address[i]);
+void generate_addr2line_command(const char *input, char *output, size_t output_size)
+{
+    char program_name[256];
+    unsigned long long address;
 
-        if (fork() == 0) {
-            execlp("bash", "bash", "-c", addr2line_cmd, NULL);
-            exit(0);
-        } else {
-            wait(NULL);
-        }
+    int result = sscanf(input, "%[^+(]%*c%llx", program_name, &address);
+
+    if (result != 2)
+    {
+        snprintf(output, output_size, "Error: Formato incorrecto.");
+    }
+    else
+    {
+        #ifdef __APPLE__
+			/* apple does things differently... */
+			//sprintf(addr2line_cmd,"atos -o %.256s %p", program_name, addr); 
+			snprintf(output, output_size, "atos -o %s %#llx", program_name, address);
+		#else
+			snprintf(output, output_size, "addr2line -e %s + %#llx", program_name, address);
+		#endif
+        //snprintf(output, output_size, "addr2line -e %s + %#llx", program_name, address);
     }
 }
 
-void get_trace() {
-    void *callstack[20];
-    size_t size;
-    char **strings;
-    size_t i;
+void get_program_name(char *program_name)
+{
+	pid_t my_pid = getpid();
+	char proc_path[1024];
+	ssize_t len;
 
-    size = backtrace(callstack, sizeof(callstack) / sizeof(callstack[0]));
-    strings = backtrace_symbols(callstack, size);
+	snprintf(proc_path, sizeof(proc_path), "/proc/%d/cmdline", my_pid);
 
-    if (strings == NULL) {
-        perror("backtrace_symbols");
-        exit(EXIT_FAILURE);
-    }
+	int fd = open(proc_path, O_RDONLY);
+	if (fd == -1)
+	{
+		return;
+	}
+	len = read(fd, program_name, sizeof(program_name) - 1);
+	close(fd);
 
-    for (i = 0; i < size; i++) {
-        fprintf(stderr, "%s\n", strings[i]);
-    }
+	if (len > 0)
+	{
+		program_name[len] = '\0';
+	}
+}
 
-    get_function_names(callstack, size);
-    free(strings);
+void get_trace()
+{
+	fprintf(stdout, "seg fault handle\n");
+	void *callstack[40] = {0};
+	char program_name[256] = {0};
+	char cmd[256] = {0};
+	size_t size;
+	char **strings;
+	size_t i;
+
+	size = backtrace(callstack, sizeof(callstack) / sizeof(callstack[0]));
+	strings = backtrace_symbols(callstack, size);
+
+	if (strings == NULL)
+	{
+		return;
+	}
+	get_program_name(program_name);
+
+	for (i = 0; i < size; i++)
+	{
+		if (strstr(strings[i], program_name) != NULL)
+		{
+			generate_addr2line_command(strings[i], cmd, sizeof(cmd));
+			fprintf(stdout, "%s\n", cmd);
+			break;
+		}
+	}
+
+	free(strings);
 }

@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
-int print(char *str)
+void print(char *str)
 {
 	while(*str)
 	{
@@ -10,12 +10,21 @@ int print(char *str)
 		str++;
 	}
 }
+
+void a()
+{
+	char *str2 = malloc(1338);
+	if(!str2)
+		return;
+	str2[50] = '\0';
+	free(str2);
+}
 int main()
 {
-
-	char *str;
+	//char* truc = 0;
+	//*truc = 'a';
 	
-	str = malloc(1337);
+	char *str = malloc(1337);
 	if(!str)
 		exit(0);
 	if(str)
@@ -30,22 +39,21 @@ int main()
 		free(str);
 	}
 	
-	str = malloc(1338);
-	if(!str)
-		exit (0);
-	str[1] = '\0';
-	free(str);
+	a();
 
-	char **test = malloc(5);
-	if(!test)
-		exit(0);
+	char **test = malloc(5 * sizeof(char*));
+	if(!(test))
+	{
+		printf("test null\n");
+		return 0;
+	}
 	for (int i = 0; i < 4; i++)
 	{
 		char *a = malloc(2);
 		test[i] = a;
 	}
 	test[20][1] = '\0';
-	
-	
-	return 0;
+
+	print("Amonos\n");
+	return 20;
 }

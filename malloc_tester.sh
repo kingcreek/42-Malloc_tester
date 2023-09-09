@@ -1,16 +1,14 @@
 #!/bin/bash
 
 show_welcome_message() {
-	
-echo " _    _                                _    ";
-echo "| |  (_)                              | |   ";
-echo "| | ___ _ __   __ _  ___ _ __ ___  ___| | __";
-echo "| |/ / | '_ \ / _\` |/ __| '__/ _ \/ _ \ |/ /";
-echo "|   <| | | | | (_| | (__| | |  __/  __/   < ";
-echo "|_|\_\_|_| |_|\__, |\___|_|  \___|\___|_|\_\\";
-echo "               __/ |                        ";
-echo "              |___/                         ";
-
+  echo " _    _                                _    ";
+  echo "| |  (_)                              | |   ";
+  echo "| | ___ _ __   __ _  ___ _ __ ___  ___| | __";
+  echo "| |/ / | '_ \ / _\` |/ __| '__/ _ \/ _ \ |/ /";
+  echo "|   <| | | | | (_| | (__| | |  __/  __/   < ";
+  echo "|_|\_\_|_| |_|\__, |\___|_|  \___|\___|_|\_\\";
+  echo "               __/ |                        ";
+  echo "              |___/                         ";
 }
 
 show_welcome_message
@@ -26,7 +24,7 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
   LOCAL_LIBRARY_NAME="malloc_tester.dylib"
   LOAD_FUNCTION="DYLD_INSERT_LIBRARIES"
 else
-  echo "Sistema operativo no compatible."
+  echo "Unsupported operating system."
   exit 1
 fi
 
@@ -39,51 +37,38 @@ if [ -n "$BASH_VERSION" ]; then
   bind '"\e[B": history-search-forward' 2>/dev/null
 fi
 
-echo "Descargando la biblioteca compartida desde $REMOTE_LIBRARY_URL..."
-#curl -L -o $LOCAL_LIBRARY_NAME $REMOTE_LIBRARY_URL
+echo "Downloading the shared library from $REMOTE_LIBRARY_URL..."
+curl -L -o $LOCAL_LIBRARY_NAME $REMOTE_LIBRARY_URL
 
 if [ $? -ne 0 ]; then
-  echo "Error al descargar la biblioteca compartida."
+  echo "Error downloading shared library."
   exit 1
 fi
+echo "Make sure your program is compiled with flag -g if you want to know the location of the error if there is one."
+read -p "Enter the path of the executable: " EXECUTABLE_PATH
 
-read -p "Ingrese la ruta del ejecutable: " EXECUTABLE_PATH
-#EXECUTABLE_PATH="./fractol Mandelbrot"
 EJECUTABLE=$(echo "$EXECUTABLE_PATH" | awk '{print $1}')
 if [ ! -f "$EJECUTABLE" ]; then
-  echo "El ejecutable no existe en la ubicación especificada."
+  echo "The executable does not exist in the specified location."
   rm -f $LOCAL_LIBRARY_NAME
   exit 1
 fi
 
+rm -f address.0x00
 touch address.0x00
-#touch repeater
 
-echo "Ejecutando $EXECUTABLE_PATH con la biblioteca $LOCAL_LIBRARY_NAME cargada..."
+echo "Launch $EXECUTABLE_PATH with lib $LOCAL_LIBRARY_NAME..."
 
-ok_flag=0
+ok_flag=1
 
 while true; do
-  program_output=$(LD_PRELOAD=$(readlink -f ./$LOCAL_LIBRARY_NAME) $EXECUTABLE_PATH) # 2>&1)
+  program_output=$(eval "$LOAD_FUNCTION=./$LOCAL_LIBRARY_NAME $EXECUTABLE_PATH")
   program_result=$?
-
-  echo $program_output
-
-
-  #if [ "$program_output" == *"Segmentation fault"* ]; then
-  #  echo -e "\n\e[31mKO\e[0m"
-  #  rm -f repeater
-  #  break
-  #  elif [ $program_result -eq 0 ]; then
-  if [ $program_result -eq 0 ]; then
-	if [ -f "repeater" ]; then
-		continue
-	fi
-	ok_flag=1
-	#rm -f repeater
-	break
-  else
-	rm -f repeater
+  
+  if [ $program_result -eq 139 ]; then
+    ok_flag=0
+    break
+  elif [[ "$program_output" == *"Finished tester"* ]]; then
     break
   fi
 done
@@ -92,9 +77,17 @@ if [ $ok_flag -eq 1 ]; then
   echo -e "\n\e[32mOK\e[0m"
 else
   echo -e "\n\e[31mKO\e[0m"
+  if [[ $program_output == *"addr2line -e"* || $program_output == *"atos -o"* ]]; then
+    command_to_execute=$(echo "$program_output" | grep -oE "(addr2line -e [^[:space:]]+ \+[[:space:]]0x[0-9a-fA-F]+)|(atos -o [^[:space:]]+ \+[[:space:]]0x[0-9a-fA-F]+)|(atos -o [^[:space:]]+ [[:space:]]0x[0-9a-fA-F]+)")
+
+    eval_result=$(eval "$command_to_execute")
+    echo "accessing unprotected memory at: $eval_result"
+  else
+    echo "Not cmd"
+  fi
 fi
 
 rm -f $LOCAL_LIBRARY_NAME
 rm -f address.0x00
 
-echo "Ejecución completa."
+echo "Finish."

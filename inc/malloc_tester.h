@@ -6,7 +6,7 @@
 /*   By: imurugar <imurugar@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/08 10:12:50 by imurugar          #+#    #+#             */
-/*   Updated: 2023/09/08 13:35:12 by imurugar         ###   ########.fr       */
+/*   Updated: 2023/09/09 11:51:43 by imurugar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,9 +29,11 @@
 #include <malloc.h>
 #endif
 
+
 int save_call_nbr(const char *filename, int nbr);
 int get_call_nbr(const char *filename);
-void get_function_names(void *direcciones[], int numDirecciones);
+void get_function_names(char *input);
 void get_trace();
+void program_finish();
 
 #endif

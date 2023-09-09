@@ -5,8 +5,9 @@ SHLIB_SUFFIX := so
 ifeq ($(shell uname -s),Darwin)
 	DARWIN_DYLIB_FLAGS := -shared -fPIC -compatibility_version 1 -current_version 1 -dynamiclib
 	CCLIB := $(CC) $(DARWIN_DYLIB_FLAGS)
+	SHLIB_SUFFIX := dylib
 else
-	CCLIB := $(CC) -shared -fPIC
+	CCLIB := $(CC) -shared -fPIC -lc
 endif
 
 # Directorios de origen y compilación
@@ -34,6 +35,6 @@ re: clean all
 
 # Regla genérica para compilar archivos .c en objetos
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
-	$(CC) -c -I /include --std=c99 -fPIC -o $@ $<
+	$(CC) -c -I /include -fPIC -o $@ $<
 
 .PHONY: all clean mkdir
