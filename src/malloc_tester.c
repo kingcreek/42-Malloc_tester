@@ -6,7 +6,7 @@
 /*   By: imurugar <imurugar@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/08 10:12:07 by imurugar          #+#    #+#             */
-/*   Updated: 2023/09/09 13:25:15 by imurugar         ###   ########.fr       */
+/*   Updated: 2023/09/09 19:21:01 by imurugar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,10 +37,16 @@ void segfault_handler(int signo) {
 	exit(139);
 }
 
+void close_handler(int signo)
+{
+	fprintf(stdout, "Finished tester\n");
+}
+
 __attribute__((constructor)) static void init()
 {
 	lock_mutex_malloc();
 	signal(SIGSEGV, segfault_handler);
+	signal(SIGINT, close_handler);
 	atexit(program_finish);
 	ignore_malloc = 0;
 	allocated_bytes = 0;

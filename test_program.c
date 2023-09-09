@@ -1,6 +1,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <readline/readline.h>
+
+
+// gcc test_program.c -g -lreadline
 
 void print(char *str)
 {
@@ -21,8 +25,19 @@ void a()
 }
 int main()
 {
-	//char* truc = 0;
-	//*truc = 'a';
+	/*
+	char *std_in;
+    while (1) {
+        printf(">>> ");
+        fflush(stdout); // Añadir esta línea para forzar la salida en pantalla
+        std_in = readline("");
+        if (std_in == NULL) {
+            continue;
+        }
+        if (strcmp(std_in, "exit") == 0)
+            break;
+    }
+	*/
 	
 	char *str = malloc(1337);
 	if(!str)
