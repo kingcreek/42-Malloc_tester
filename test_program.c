@@ -25,7 +25,7 @@ void a()
 }
 int main()
 {
-	/*
+	
 	char *std_in;
     while (1) {
         printf(">>> ");
@@ -37,7 +37,7 @@ int main()
         if (strcmp(std_in, "exit") == 0)
             break;
     }
-	*/
+	
 	
 	char *str = malloc(1337);
 	if(!str)

@@ -38,7 +38,7 @@ fi
 echo "Make sure your program is compiled with flag -g if you want to know the location of the error if there is one."
 read -p "Enter the path of the executable: " EXECUTABLE_PATH
 
-EXECUTABLE_PATH="./a.out"
+EXECUTABLE_PATH="./minishell"
 
 EJECUTABLE=$(echo "$EXECUTABLE_PATH" | awk '{print $1}')
 
@@ -62,7 +62,8 @@ echo "Launch $EXECUTABLE_PATH with lib $LOCAL_LIBRARY_NAME..."
 ok_flag=1
 
 while true; do
-	program_output=$(eval "$LOAD_FUNCTION=./$LOCAL_LIBRARY_NAME $EXECUTABLE_PATH" 2>&1 | tee /dev/tty)
+	#program_output=$(eval "$LOAD_FUNCTION=./$LOCAL_LIBRARY_NAME $EXECUTABLE_PATH" 2>&1 | tee /dev/tty)
+	program_output=$(eval "$LOAD_FUNCTION=./$LOCAL_LIBRARY_NAME $EXECUTABLE_PATH" | tee /dev/tty)
   	#eval "$LOAD_FUNCTION=./$LOCAL_LIBRARY_NAME $EXECUTABLE_PATH" < /dev/tty &
   	#pid=$!
   	#wait $pid
