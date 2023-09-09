@@ -24,4 +24,4 @@ Load shared DyLib:
 # TODO
 -Bypass minilibx
 
--Give control to the terminal to interact with input commands
+-Give control to the terminal to interact with input commands (maybe finish, need some test)
