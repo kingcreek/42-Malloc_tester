@@ -81,7 +81,7 @@ else
     command_to_execute=$(echo "$program_output" | grep -oE "(addr2line -e [^[:space:]]+ \+[[:space:]]0x[0-9a-fA-F]+)|(atos -o [^[:space:]]+ \+[[:space:]]0x[0-9a-fA-F]+)|(atos -o [^[:space:]]+ [[:space:]]0x[0-9a-fA-F]+)")
 
     eval_result=$(eval "$command_to_execute")
-    echo "accessing unprotected memory at: $eval_result"
+    echo "Segmentation fault: $eval_result"
   else
     echo "Not cmd"
   fi

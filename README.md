@@ -1,5 +1,11 @@
 # 42-Malloc_tester
- 
+
+# USAGE
+
+`bash -c "$(curl -fsSL https://github.com/kingcreek/42-Malloc_tester/raw/main/malloc_tester.sh)"`
+
+# Compilation
+
 Compile in Linux:
 `gcc -shared -fPIC malloc_tester.c -o malloc_tester.so`
 
