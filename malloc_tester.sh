@@ -28,15 +28,6 @@ else
   exit 1
 fi
 
-# Carga la biblioteca readline
-if [ -n "$BASH_VERSION" ]; then
-  bind 'set bell-style none' 2>/dev/null
-  bind 'set editing-mode emacs' 2>/dev/null
-  bind 'TAB:menu-complete' 2>/dev/null
-  bind '"\e[A": history-search-backward' 2>/dev/null
-  bind '"\e[B": history-search-forward' 2>/dev/null
-fi
-
 echo "Downloading the shared library from $REMOTE_LIBRARY_URL..."
 curl -L -o $LOCAL_LIBRARY_NAME $REMOTE_LIBRARY_URL
 
@@ -47,7 +38,10 @@ fi
 echo "Make sure your program is compiled with flag -g if you want to know the location of the error if there is one."
 read -p "Enter the path of the executable: " EXECUTABLE_PATH
 
+#EXECUTABLE_PATH="./minishell"
+
 EJECUTABLE=$(echo "$EXECUTABLE_PATH" | awk '{print $1}')
+
 if [ ! -f "$EJECUTABLE" ]; then
   echo "The executable does not exist in the specified location."
   rm -f $LOCAL_LIBRARY_NAME

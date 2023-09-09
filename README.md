@@ -20,3 +20,7 @@ Compile in MacOs:
 Load shared DyLib:
 `DYLD_INSERT_LIBRARIES=./malloc_tester.dylib ./Your_Program`
 
+
+# TODO
+-Bypass minilibx
+-Give control to the terminal to interact with input commands
