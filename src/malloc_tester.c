@@ -6,7 +6,7 @@
 /*   By: imurugar <imurugar@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/08 10:12:07 by imurugar          #+#    #+#             */
-/*   Updated: 2023/09/10 14:14:44 by imurugar         ###   ########.fr       */
+/*   Updated: 2023/09/10 14:16:19 by imurugar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
 #define MAX_CALLSTACK_SIZE 255
 void *callstack[MAX_CALLSTACK_SIZE];
 
-const char *filename = "address.0x00";
+const char *filename = "./.MALLOC_TESTER/address.0x00";
 int ignore_malloc = 1;
 size_t allocated_bytes;
 size_t freed_bytes;
