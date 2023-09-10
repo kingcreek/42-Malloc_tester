@@ -22,10 +22,15 @@ curl -L -o "$HOME/$FOLDER/malloc_tester.sh" "https://github.com/kingcreek/42-Mal
 
 chmod +x "$HOME/$FOLDER/malloc_tester.sh"
 
-echo "alias malloc_tester=\"$HOME/$FOLDER/malloc_tester.sh\"" >> "$HOME/.zshrc"  
-echo "alias king=\"$HOME/$FOLDER/malloc_tester.sh\"" >> "$HOME/.zshrc"
+if [ "$SO" == "linux" ]; then
+	echo "alias malloc_tester=\"$HOME/$FOLDER/malloc_tester.sh\"" >> "$HOME/.bashrc"  
+	echo "alias king=\"$HOME/$FOLDER/malloc_tester.sh\"" >> "$HOME/.bashrc"
+	source "$HOME/.bashrc"
+elif [ "$SO" == "macos" ]; then
+	echo "alias malloc_tester=\"$HOME/$FOLDER/malloc_tester.sh\"" >> "$HOME/.zshrc"  
+	echo "alias king=\"$HOME/$FOLDER/malloc_tester.sh\"" >> "$HOME/.zshrc"
+	source "$HOME/.zshrc"
+fi
 
-echo "alias malloc_tester=\"$HOME/$FOLDER/malloc_tester.sh\"" >> "$HOME/.bashrc"  
-echo "alias king=\"$HOME/$FOLDER/malloc_tester.sh\"" >> "$HOME/.bashrc"
 
 echo "Configuration completed. You can run 'malloc_tester' to run the program."
