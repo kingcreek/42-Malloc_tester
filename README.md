@@ -14,7 +14,7 @@
 # Compilation
 
 Compile in Linux:
-`gcc -shared -fPIC malloc_tester.c -o malloc_tester.so`
+`make`
 
 Load shared lib:
 `LD_PRELOAD=./malloc_tester.so ./Your_Program`
@@ -22,7 +22,7 @@ Load shared lib:
 
 
 Compile in MacOs:
-`gcc -dynamiclib malloc_tester.c -o malloc_tester.dylib`
+`make`
 
 Load shared DyLib:
 `DYLD_INSERT_LIBRARIES=./malloc_tester.dylib ./Your_Program`
