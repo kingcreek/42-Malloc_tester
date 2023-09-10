@@ -14,6 +14,8 @@ show_welcome_message() {
 show_welcome_message
 
 FOLDER=".malloc_tester"
+ADDRESSFILE=$HOME/$FOLDER/address.0x00
+TRACE_FILE="$HOME/$FOLDER/trace"
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
   LOCAL_LIBRARY_NAME="$HOME/$FOLDER/malloc_tester.so"
@@ -33,18 +35,27 @@ fi
 #  echo "Error downloading shared library."
 #  exit 1
 #fi
-echo "Make sure that the program is compiled with the "-g" flag as well as the libraries that you use (ft_printf, libft..) for a correct operation of the tester"
-read -p "Enter the path of the executable: " EXECUTABLE_PATH
+echo -e "\nMake sure that the program is compiled with the "-g" flag as well as the libraries that you use (ft_printf, libft..) for a correct operation of the tester"
+read -e -p "Enter the path of the executable: " EXECUTABLE_PATH
 
-EJECUTABLE=$(echo "$EXECUTABLE_PATH" | awk '{print $1}')
+if [[ "$EXECUTABLE_PATH" == "leaks "* ]]; then
+  PROGRAM_NAME=$(echo "$EXECUTABLE_PATH" | cut -d' ' -f2)
+  while true; do
+    leaks -q "$PROGRAM_NAME"
+  done
+fi
 
-if [ ! -f "$EJECUTABLE" ]; then
+if [[ ! "$EXECUTABLE_PATH" =~ ^\./.* ]]; then
+  EXECUTABLE_PATH="./$EXECUTABLE_PATH"
+fi
+
+if [ ! -f "$EXECUTABLE_PATH" ]; then
   echo "The executable does not exist in the specified location."
   exit 1
 fi
 
-rm -f $HOME/$FOLDER/address.0x00
-touch $HOME/$FOLDER/address.0x00
+rm -f $ADDRESSFILE
+touch $ADDRESSFILE
 
 echo "Launch $EXECUTABLE_PATH with lib injected..."
 
@@ -57,6 +68,9 @@ echo "Launch $EXECUTABLE_PATH with lib injected..."
 ok_flag=1
 
 while true; do
+
+	rm -f $HOME/$FOLDER/trace
+	touch $HOME/$FOLDER/trace
 	#program_output=$(eval "$LOAD_FUNCTION=./$LOCAL_LIBRARY_NAME $EXECUTABLE_PATH" 2>&1 | tee /dev/tty)
 	program_output=$(eval "$LOAD_FUNCTION=$LOCAL_LIBRARY_NAME $EXECUTABLE_PATH" | tee /dev/tty)
   	#eval "$LOAD_FUNCTION=./$LOCAL_LIBRARY_NAME $EXECUTABLE_PATH" < /dev/tty &
@@ -78,17 +92,28 @@ done
 if [ $ok_flag -eq 1 ]; then
   echo -e "\n\e[32mOK\e[0m"
 else
-  echo -e "\n\e[31mKO\e[0m"
-  
-  if [[ $program_output == *"addr2line -e"* || $program_output == *"atos -o"* ]]; then
-    command_to_execute=$(echo "$program_output" | grep -oE "(addr2line -e [^[:space:]]+ \+[[:space:]]0x[0-9a-fA-F]+)|(atos -o [^[:space:]]+ \+[[:space:]]0x[0-9a-fA-F]+)|(atos -o [^[:space:]]+ [[:space:]]0x[0-9a-fA-F]+)")
-    eval_result=$(eval "$command_to_execute")
-    echo "Segmentation fault: $eval_result"
-  else
-    echo "Not cmd"
-  fi
+	echo -e "\n\e[31mKO\e[0m"
+	if [ -f "$TRACE_FILE" ]; then
+		echo -e "\n----TRACE----"
+
+		mapfile -t lines < "$TRACE_FILE"
+		num_lines=${#lines[@]}
+		for ((i = 0; i < num_lines - 1; i++)); do
+			line="${lines[i]}"
+			result=$(eval "$line")
+			mapfile -t result_lines <<< "$result"
+			if [ "${#result_lines[@]}" -ge 2 ]; then
+      			if [[ ${result_lines[1]} != "??:?"* ]]; then
+					echo "- ${result_lines[1]}"
+				else
+					echo "- This trace is not traceable, have you compiled with -g the program and libraries?"
+				fi
+    		fi
+		done
+	fi
 fi
 
-rm -f $HOME/$FOLDER/address.0x00
+rm -f $ADDRESSFILE
+rm -f $TRACE_FILE
 
-echo "Finish."
+echo -e "\nFinish."

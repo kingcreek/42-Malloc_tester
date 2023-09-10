@@ -6,7 +6,7 @@
 /*   By: imurugar <imurugar@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/08 10:12:07 by imurugar          #+#    #+#             */
-/*   Updated: 2023/09/10 15:31:30 by imurugar         ###   ########.fr       */
+/*   Updated: 2023/09/10 23:06:00 by imurugar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@ int ignore_malloc = 1;
 size_t allocated_bytes;
 size_t freed_bytes;
 int malloc_counter;
+char program_name[512] = {0};
 
 static void lock_mutex_malloc() { ignore_malloc = 1; }
 static void unlock_mutex_malloc() { ignore_malloc = 0; }
@@ -39,7 +40,25 @@ void segfault_handler(int signo)
 
 void close_handler(int signo)
 {
-	fprintf(stdout, "Finished tester\n");
+	#ifdef __APPLE__
+		fprintf(stdout, "Finished tester\n\
+		Total memory allocated by you:%zu\n\
+		Total memory freed by you:%zu\n\
+		Total unreleased memory and you pray for the system to release it:%zu"\
+		,allocated_bytes, freed_bytes, allocated_bytes - freed_bytes);
+	#endif
+}
+
+void program_finish()
+{
+	lock_mutex_malloc();
+	if (malloc_counter == 0)
+		fprintf(stdout, "Finished tester\n\
+		Total memory allocated by you:%zu\n\
+		Total memory freed by you:%zu\n\
+		Total unreleased memory and you pray for the system to release it:%zu"\
+		,allocated_bytes, freed_bytes, allocated_bytes - freed_bytes);
+	unlock_mutex_malloc();
 }
 
 __attribute__((constructor)) static void init()
@@ -51,18 +70,12 @@ __attribute__((constructor)) static void init()
 	const char *home_dir = getenv("HOME");
 	if (home_dir != NULL)
 		snprintf(file_path, sizeof(file_path), "%s/.malloc_tester/address.0x00", home_dir);
+	
 	ignore_malloc = 0;
 	allocated_bytes = 0;
 	freed_bytes = 0;
 	malloc_counter = 0;
-	unlock_mutex_malloc();
-}
-
-void program_finish()
-{
-	lock_mutex_malloc();
-	if (malloc_counter == 0)
-		fprintf(stdout, "Finished tester\n");
+	get_program_name(program_name);
 	unlock_mutex_malloc();
 }
 
@@ -70,7 +83,11 @@ INTERPOSE_C_VOID(exit, (int status), (status))
 {
 	lock_mutex_malloc();
 	if (malloc_counter == 0)
-		fprintf(stdout, "Finished tester\n");
+		fprintf(stdout, "Finished tester\n\
+		Total memory allocated by you:%zu\n\
+		Total memory freed by you:%zu\n\
+		Total unreleased memory and you pray for the system to release it:%zu"\
+		,allocated_bytes, freed_bytes, allocated_bytes - freed_bytes);
 	unlock_mutex_malloc();
 	Real__exit(status);
 }
@@ -79,55 +96,67 @@ INTERPOSE_C(void *, malloc, (size_t sz), (sz))
 {
 	if (ignore_malloc == 0)
 	{
-		char **strings;
-
 		lock_mutex_malloc();
 		void *caller = NULL;
 		int size = backtrace(callstack, sizeof(callstack) / sizeof(callstack[0]));
-		strings = backtrace_symbols(callstack, size);
+		char **strings = backtrace_symbols(callstack, size);
 		if (size <= 0)
 		{
 			unlock_mutex_malloc();
 			void *result = Real__malloc(sz);
-			allocated_bytes += malloc_usable_size(result);
+			//allocated_bytes += malloc_usable_size(result);
 			return result;
 		}
 		caller = callstack[1];
 
-		if (caller < (void *)0x7f0000000000)
-		{
-			char program_name[256] = {0};
-			get_program_name(program_name);
-			//  Skip previus malloc function calls
-			// maybe can remove loop, i need test if it's always position 1
+		//Dl_info info;
+		//if (dladdr(callstack[1], &info) && strstr(info.dli_fname, program_name) != NULL) {
+		if (caller < (void *)0x7f0000000000) {
+			//   Skip previus malloc function calls
+			/*
 			for (int i = 0; i < size; i++)
 			{
-				if (strstr(strings[i], program_name) != NULL)
+				Dl_info info;
+				if (dladdr(callstack[i], &info))
 				{
-					fprintf(stderr, "");
-					char address_str[20];
-					if (sscanf(strings[i], "%*[^+]+%[^)]", address_str) == 1)
-					{
-						if (write_in_file(file_path, address_str))
-						{
-							malloc_counter++;
-							unlock_mutex_malloc();
-							return NULL;
-						}
-					}
-					void *result = Real__malloc(sz);
-					allocated_bytes += malloc_usable_size(result);
-					unlock_mutex_malloc();
-					return result;
+					// dladdr(callstack[i], &info);
+					fprintf(stderr, "Function number: %d\n", i);
+					fprintf(stderr, "Function Name: %s\n", info.dli_sname);
+					fprintf(stderr, "Library Path: %s\n", info.dli_fname);
+					fprintf(stderr, "Library Base Address: %p\n", info.dli_fbase);
+					fprintf(stderr, "Symbol Address: %p\n", info.dli_saddr);
+					fprintf(stderr, "-----------------\n\n");
 				}
 			}
+			*/
+			if (strstr(strings[1], program_name) != NULL)
+			{
+				char address_str[20];
+				if (sscanf(strings[1], "%*[^+]+%[^)]", address_str) == 1)
+				{
+					if (write_in_file(file_path, address_str))
+					{
+						malloc_counter++;
+						free(strings);
+						unlock_mutex_malloc();
+						return NULL;
+					}
+				}
+				void *result = Real__malloc(sz);
+				allocated_bytes += malloc_usable_size(result);
+				free(strings);
+				unlock_mutex_malloc();
+				return result;
+			}
+
 			unlock_mutex_malloc();
+			free(strings);
 			return NULL;
 		}
 		unlock_mutex_malloc();
 	}
 	void *result = Real__malloc(sz);
-	allocated_bytes += malloc_usable_size(result);
+	//allocated_bytes += malloc_usable_size(result);
 	return result;
 }
 
@@ -135,7 +164,22 @@ INTERPOSE_C_VOID(free, (void *p), (p))
 {
 	if (ignore_malloc == 0)
 	{
-		freed_bytes += malloc_usable_size(p);
+		void *caller = NULL;
+		int size = backtrace(callstack, sizeof(callstack) / sizeof(callstack[0]));
+		char **strings = backtrace_symbols(callstack, size);
+		if (size <= 0)
+		{
+			unlock_mutex_malloc();
+			//freed_bytes += malloc_usable_size(p);
+			Real__free(p);
+			Real__free(strings);
+			return;
+		}
+		caller = callstack[3];
+
+		if (strstr(strings[4], program_name) != NULL)
+			freed_bytes += malloc_usable_size(p);
+		Real__free(strings);
 	}
 	Real__free(p);
 }

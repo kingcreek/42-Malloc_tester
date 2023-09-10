@@ -27,10 +27,3 @@ Compile in MacOs:
 Load shared DyLib:
 `DYLD_INSERT_LIBRARIES=./malloc_tester.dylib ./Your_Program`
 
-
-# TODO
--Bypass minilibx (self reminder: if i can't resolve the address, i skip the call ?) 🤬
-
-~~-Give control to the terminal to interact with input commands (maybe finish, need some test)~~ DONE
-
-~~-Change count system, because don't work if correctly protected malloc it's called dynamically inside a infinite loop (self reminder maybe a chance to work in (baseaddr + offset) taking advantage of the backtrace ?)~~ DONE

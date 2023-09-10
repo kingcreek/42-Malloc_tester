@@ -6,7 +6,7 @@
 /*   By: imurugar <imurugar@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/08 10:12:50 by imurugar          #+#    #+#             */
-/*   Updated: 2023/09/10 15:07:45 by imurugar         ###   ########.fr       */
+/*   Updated: 2023/09/10 21:23:16 by imurugar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,13 +29,18 @@
 #include <malloc.h>
 #endif
 
+#define PROGRAM_NAME_BUFFER_SIZE 512
 
+/*FILE FUNCTIONS*/
 void get_function_names(char *input);
 void get_trace();
 void program_finish();
 void get_program_name(char *program_name);
+
+/*FILE FUNCTIONS*/
 int write_in_file(const char *file, const char *str);
 int find_in_file(const char *file, const char *str);
-void *real_malloc_and_update(size_t sz);
+int write_in_file_simple(const char *file, const char *str);
+
 
 #endif
