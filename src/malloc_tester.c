@@ -6,7 +6,7 @@
 /*   By: imurugar <imurugar@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/08 10:12:07 by imurugar          #+#    #+#             */
-/*   Updated: 2023/09/09 19:21:01 by imurugar         ###   ########.fr       */
+/*   Updated: 2023/09/10 12:10:05 by imurugar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,14 +77,15 @@ INTERPOSE_C_VOID(exit, (int status), (status))
 
 INTERPOSE_C(void *, malloc, (size_t sz), (sz))
 {
-
 	if (ignore_malloc == 0)
 	{
-
+		char **strings;
+		
 		lock_mutex_malloc();
 		void *caller = NULL;
-		int frames = backtrace(callstack, sizeof(callstack) / sizeof(callstack[0]));
-		if (frames <= 0)
+		int size = backtrace(callstack, sizeof(callstack) / sizeof(callstack[0]));
+		strings = backtrace_symbols(callstack, size);
+		if (size <= 0)
 		{
 			unlock_mutex_malloc();
 			void *result = Real__malloc(sz);
@@ -107,16 +108,27 @@ INTERPOSE_C(void *, malloc, (size_t sz), (sz))
 			}
 			//fprintf(stdout, "hooked %d frames, try alloc %zu\n", frames, sz);
 			//fprintf(stderr, "Try crash in! %p\n", caller);
+			char program_name[256] = {0};
+			get_program_name(program_name);
 			//  save call number in file
+			for (int i = 0; i < size; i++)
+			{
+				if (strstr(strings[i], program_name) != NULL)
+				{
+					//generate_addr2line_command(strings[i], cmd, sizeof(cmd));
+					fprintf(stdout, "%s\n", strings[i]);
+					break;
+				}
+			}
 			save_call_nbr(filename, ++call_nbr);
 			currentFunctionCall++;
 			malloc_counter++;
-			/*
+			
 			//perform malloc only for storage memory requested
-			void *result = Real__malloc(sz);
-			allocated_bytes += malloc_usable_size(result);
-			free(result);
-			*/
+			//void *result = Real__malloc(sz);
+			//allocated_bytes += malloc_usable_size(result);
+			//free(result);
+			
 			unlock_mutex_malloc();
 			return NULL;
 		}
@@ -127,6 +139,8 @@ INTERPOSE_C(void *, malloc, (size_t sz), (sz))
 	allocated_bytes += malloc_usable_size(result);
 	return result;
 }
+
+
 
 INTERPOSE_C_VOID(free, (void *p), (p))
 {

@@ -6,7 +6,7 @@
 /*   By: imurugar <imurugar@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/08 10:12:02 by imurugar          #+#    #+#             */
-/*   Updated: 2023/09/09 13:17:54 by imurugar         ###   ########.fr       */
+/*   Updated: 2023/09/10 12:05:32 by imurugar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,9 +75,7 @@ void get_trace()
 	strings = backtrace_symbols(callstack, size);
 
 	if (strings == NULL)
-	{
 		return;
-	}
 	get_program_name(program_name);
 
 	for (i = 0; i < size; i++)
@@ -89,6 +87,5 @@ void get_trace()
 			break;
 		}
 	}
-
 	free(strings);
 }

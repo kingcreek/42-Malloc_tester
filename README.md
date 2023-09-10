@@ -22,6 +22,8 @@ Load shared DyLib:
 
 
 # TODO
--Bypass minilibx
+-Bypass minilibx (self reminder: if i can't resolve the address, i skip the call ?) 
 
 -Give control to the terminal to interact with input commands (maybe finish, need some test)
+
+-Change count system, because don't work if correctly protected malloc it's called dynamically inside a infinite loop (self reminder maybe a chance to work in (baseaddr + offset) taking advantage of the backtrace ?)

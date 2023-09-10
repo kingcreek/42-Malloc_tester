@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <sys/wait.h>
 #include <readline/readline.h>
 
 
@@ -23,21 +24,11 @@ void a()
 	str2[50] = '\0';
 	free(str2);
 }
-int main()
+int main(int argc, char **argv, char **env)
 {
-	
-	char *std_in;
-    while (1) {
-        printf(">>> ");
-        fflush(stdout); // Añadir esta línea para forzar la salida en pantalla
-        std_in = readline("");
-        if (std_in == NULL) {
-            continue;
-        }
-        if (strcmp(std_in, "exit") == 0)
-            break;
-    }
-	
+	int		saved_stdin;
+	int		saved_stdout;
+
 	
 	char *str = malloc(1337);
 	if(!str)

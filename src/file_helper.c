@@ -6,7 +6,7 @@
 /*   By: imurugar <imurugar@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/08 13:31:58 by imurugar          #+#    #+#             */
-/*   Updated: 2023/09/08 13:32:27 by imurugar         ###   ########.fr       */
+/*   Updated: 2023/09/10 12:14:08 by imurugar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,3 +47,4 @@ int get_call_nbr(const char *filename)
 	close(fd);
 	return nbr;
 }
+

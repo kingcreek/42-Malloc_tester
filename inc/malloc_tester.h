@@ -6,7 +6,7 @@
 /*   By: imurugar <imurugar@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/08 10:12:50 by imurugar          #+#    #+#             */
-/*   Updated: 2023/09/09 11:51:43 by imurugar         ###   ########.fr       */
+/*   Updated: 2023/09/10 12:10:33 by imurugar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,5 +35,6 @@ int get_call_nbr(const char *filename);
 void get_function_names(char *input);
 void get_trace();
 void program_finish();
+void get_program_name(char *program_name);
 
 #endif
