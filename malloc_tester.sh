@@ -13,7 +13,7 @@ show_welcome_message() {
 
 show_welcome_message
 
-FOLDER=".MALLOC_TESTER"
+FOLDER=".malloc_tester"
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
   LOCAL_LIBRARY_NAME="$HOME/$FOLDER/malloc_tester.so"

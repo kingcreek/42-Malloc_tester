@@ -9,7 +9,7 @@ else
     exit 1
 fi
 
-FOLDER="MALLOC_TESTER"
+FOLDER=".malloc_tester"
 
 mkdir -p "$HOME/$FOLDER"
 
@@ -24,5 +24,8 @@ chmod +x "$HOME/$FOLDER/malloc_tester.sh"
 
 echo "alias malloc_tester=\"$HOME/$FOLDER/malloc_tester.sh\"" >> "$HOME/.zshrc"  
 echo "alias king=\"$HOME/$FOLDER/malloc_tester.sh\"" >> "$HOME/.zshrc"
+
+echo "alias malloc_tester=\"$HOME/$FOLDER/malloc_tester.sh\"" >> "$HOME/.bashrc"  
+echo "alias king=\"$HOME/$FOLDER/malloc_tester.sh\"" >> "$HOME/.bashrc"
 
 echo "Configuration completed. You can run 'malloc_tester' to run the program."
