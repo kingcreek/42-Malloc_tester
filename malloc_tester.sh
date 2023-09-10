@@ -89,6 +89,6 @@ else
   fi
 fi
 
-rm -f "$HOME/$FOLDER/address.0x00"
+#rm -f "$HOME/$FOLDER/address.0x00"
 
 echo "Finish."
