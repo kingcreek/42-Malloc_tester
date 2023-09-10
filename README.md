@@ -29,7 +29,7 @@ Load shared DyLib:
 
 
 # TODO
-~~-Bypass minilibx (self reminder: if i can't resolve the address, i skip the call ?) 🤬~~ DONE
+-Bypass minilibx (self reminder: if i can't resolve the address, i skip the call ?) 🤬
 
 ~~-Give control to the terminal to interact with input commands (maybe finish, need some test)~~ DONE
 
