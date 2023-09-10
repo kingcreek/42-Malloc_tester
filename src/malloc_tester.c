@@ -6,7 +6,7 @@
 /*   By: imurugar <imurugar@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/08 10:12:07 by imurugar          #+#    #+#             */
-/*   Updated: 2023/09/10 23:06:00 by imurugar         ###   ########.fr       */
+/*   Updated: 2023/09/10 23:21:22 by imurugar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,13 +40,11 @@ void segfault_handler(int signo)
 
 void close_handler(int signo)
 {
-	#ifdef __APPLE__
-		fprintf(stdout, "Finished tester\n\
-		Total memory allocated by you:%zu\n\
-		Total memory freed by you:%zu\n\
-		Total unreleased memory and you pray for the system to release it:%zu"\
-		,allocated_bytes, freed_bytes, allocated_bytes - freed_bytes);
-	#endif
+	fprintf(stdout, "Finished tester\n\
+	Total memory allocated by you:%zu\n\
+	Total memory freed by you:%zu\n\
+	Total unreleased memory and you pray for the system to release it:%zu"\
+	,allocated_bytes, freed_bytes, allocated_bytes - freed_bytes);
 }
 
 void program_finish()
