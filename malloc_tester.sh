@@ -13,43 +13,38 @@ show_welcome_message() {
 
 show_welcome_message
 
+FOLDER=".MALLOC_TESTER"
+
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-  # Linux
-  REMOTE_LIBRARY_URL="https://github.com/kingcreek/42-Malloc_tester/raw/main/malloc_tester.so"
-  LOCAL_LIBRARY_NAME="malloc_tester.so"
+  LOCAL_LIBRARY_NAME="$HOME/$FOLDER/malloc_tester.so"
   LOAD_FUNCTION="LD_PRELOAD"
 elif [[ "$OSTYPE" == "darwin"* ]]; then
-  # MacOS
-  REMOTE_LIBRARY_URL="https://github.com/kingcreek/42-Malloc_tester/raw/main/malloc_tester.dylib"
-  LOCAL_LIBRARY_NAME="malloc_tester.dylib"
+  LOCAL_LIBRARY_NAME="$HOME/$FOLDER/malloc_tester.dylib"
   LOAD_FUNCTION="DYLD_INSERT_LIBRARIES"
 else
   echo "Unsupported operating system."
   exit 1
 fi
 
-echo "Downloading the shared library from $REMOTE_LIBRARY_URL..."
+#echo "Downloading the shared library from $REMOTE_LIBRARY_URL..."
 #curl -L -o $LOCAL_LIBRARY_NAME $REMOTE_LIBRARY_URL
 
-if [ $? -ne 0 ]; then
-  echo "Error downloading shared library."
-  exit 1
-fi
-echo "Make sure your program is compiled with flag -g if you want to know the location of the error if there is one."
+#if [ $? -ne 0 ]; then
+#  echo "Error downloading shared library."
+#  exit 1
+#fi
+echo "Make sure that the program is compiled with the "-g" flag as well as the libraries that you use (ft_printf, libft..) for a correct operation of the tester"
 read -p "Enter the path of the executable: " EXECUTABLE_PATH
-
-EXECUTABLE_PATH="./fractol Maldelbrot"
 
 EJECUTABLE=$(echo "$EXECUTABLE_PATH" | awk '{print $1}')
 
 if [ ! -f "$EJECUTABLE" ]; then
   echo "The executable does not exist in the specified location."
-  rm -f $LOCAL_LIBRARY_NAME
   exit 1
 fi
 
-rm -f address.0x00
-touch address.0x00
+rm -f "$HOME/$FOLDER/address.0x00"
+touch "$HOME/$FOLDER/address.0x00"
 
 echo "Launch $EXECUTABLE_PATH with lib $LOCAL_LIBRARY_NAME..."
 
@@ -94,7 +89,6 @@ else
   fi
 fi
 
-rm -f $LOCAL_LIBRARY_NAME
-rm -f address.0x00
+rm -f "$HOME/$FOLDER/address.0x00"
 
 echo "Finish."

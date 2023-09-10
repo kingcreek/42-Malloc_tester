@@ -1,8 +1,12 @@
 # 42-Malloc_tester
 
-# USAGE
+# INSTALL
+`bash -c "$(curl -fsSL https://github.com/kingcreek/42-Malloc_tester/raw/main/install.sh)"`
 
-`bash -c "$(curl -fsSL https://github.com/kingcreek/42-Malloc_tester/raw/main/malloc_tester.sh)"`
+# UNINSTALL
+
+# USAGE
+`bash -c "$(curl -fsSL https://github.com/kingcreek/42-Malloc_tester/raw/main/uninstall.sh)"`
 
 # Compilation
 
@@ -22,7 +26,7 @@ Load shared DyLib:
 
 
 # TODO
--Bypass minilibx (self reminder: if i can't resolve the address, i skip the call ?) 🤬
+~~-Bypass minilibx (self reminder: if i can't resolve the address, i skip the call ?) 🤬~~ DONE
 
 ~~-Give control to the terminal to interact with input commands (maybe finish, need some test)~~ DONE
 
