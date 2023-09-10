@@ -6,7 +6,7 @@
 /*   By: imurugar <imurugar@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/08 13:31:58 by imurugar          #+#    #+#             */
-/*   Updated: 2023/09/10 15:07:32 by imurugar         ###   ########.fr       */
+/*   Updated: 2023/09/10 15:38:20 by imurugar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,6 @@ int write_in_file(const char *file, const char *str) {
     if (find_in_file(file, str) == 0) {
         int fd = open(file, O_WRONLY | O_APPEND | O_CREAT, 0644);
         if (fd == -1) {
-            perror("open");
             return -1;
         }
 
