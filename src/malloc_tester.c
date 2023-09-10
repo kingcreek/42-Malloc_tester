@@ -6,7 +6,7 @@
 /*   By: imurugar <imurugar@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/08 10:12:07 by imurugar          #+#    #+#             */
-/*   Updated: 2023/09/10 15:27:06 by imurugar         ###   ########.fr       */
+/*   Updated: 2023/09/10 15:31:30 by imurugar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,10 +49,8 @@ __attribute__((constructor)) static void init()
 	signal(SIGINT, close_handler);
 	atexit(program_finish);
 	const char *home_dir = getenv("HOME");
-	fprintf(stdout, "HOME: %s\n", home_dir);
 	if (home_dir != NULL)
 		snprintf(file_path, sizeof(file_path), "%s/.malloc_tester/address.0x00", home_dir);
-	fprintf(stdout, "path: %s\n", file_path);
 	ignore_malloc = 0;
 	allocated_bytes = 0;
 	freed_bytes = 0;
