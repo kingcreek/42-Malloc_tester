@@ -9,7 +9,7 @@ else
     exit 1
 fi
 
-FOLDER=".MALLOC_TESTER"
+FOLDER="MALLOC_TESTER"
 
 mkdir -p "$HOME/$FOLDER"
 
