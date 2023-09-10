@@ -38,7 +38,7 @@ fi
 echo "Make sure your program is compiled with flag -g if you want to know the location of the error if there is one."
 read -p "Enter the path of the executable: " EXECUTABLE_PATH
 
-EXECUTABLE_PATH="./a.out"
+EXECUTABLE_PATH="./fractol Maldelbrot"
 
 EJECUTABLE=$(echo "$EXECUTABLE_PATH" | awk '{print $1}')
 
