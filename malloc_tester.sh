@@ -43,8 +43,8 @@ if [ ! -f "$EJECUTABLE" ]; then
   exit 1
 fi
 
-rm -f "$HOME/$FOLDER/address.0x00"
-touch "$HOME/$FOLDER/address.0x00"
+rm -f $HOME/$FOLDER/address.0x00
+touch $HOME/$FOLDER/address.0x00
 
 echo "Launch $EXECUTABLE_PATH with lib injected..."
 
@@ -89,6 +89,6 @@ else
   fi
 fi
 
-#rm -f "$HOME/$FOLDER/address.0x00"
+rm -f $HOME/$FOLDER/address.0x00
 
 echo "Finish."
