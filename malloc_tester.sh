@@ -46,7 +46,7 @@ fi
 rm -f "$HOME/$FOLDER/address.0x00"
 touch "$HOME/$FOLDER/address.0x00"
 
-echo "Launch $EXECUTABLE_PATH with lib $LOCAL_LIBRARY_NAME..."
+echo "Launch $EXECUTABLE_PATH with lib injected..."
 
 #handle_sigint() {
 #	echo $pid

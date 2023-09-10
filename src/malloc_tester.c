@@ -6,7 +6,7 @@
 /*   By: imurugar <imurugar@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/08 10:12:07 by imurugar          #+#    #+#             */
-/*   Updated: 2023/09/10 14:56:12 by imurugar         ###   ########.fr       */
+/*   Updated: 2023/09/10 15:09:02 by imurugar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,8 @@
 
 #define MAX_CALLSTACK_SIZE 255
 void *callstack[MAX_CALLSTACK_SIZE];
+
+char file_path[256] = {0};
 
 int ignore_malloc = 1;
 size_t allocated_bytes;
@@ -46,6 +48,10 @@ __attribute__((constructor)) static void init()
 	signal(SIGSEGV, segfault_handler);
 	signal(SIGINT, close_handler);
 	atexit(program_finish);
+	const char *home_dir = getenv("HOME");
+	char file_path[256];
+	if (home_dir != NULL)
+		snprintf(file_path, sizeof(file_path), "%s/.malloc_tester/address.0x00", home_dir);
 	ignore_malloc = 0;
 	allocated_bytes = 0;
 	freed_bytes = 0;
@@ -103,7 +109,7 @@ INTERPOSE_C(void *, malloc, (size_t sz), (sz))
 					char address_str[20];
 					if (sscanf(strings[i], "%*[^+]+%[^)]", address_str) == 1)
 					{
-						if (write_in_file(address_str))
+						if (write_in_file(file_path, address_str))
 						{
 							malloc_counter++;
 							unlock_mutex_malloc();
