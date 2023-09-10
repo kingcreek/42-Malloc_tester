@@ -45,11 +45,9 @@ if [[ "$EXECUTABLE_PATH" == "leaks "* ]]; then
   done
 fi
 
-if [[ ! "$EXECUTABLE_PATH" =~ ^\./.* ]]; then
-  EXECUTABLE_PATH="./$EXECUTABLE_PATH"
-fi
+EJECUTABLE=$(echo "$EXECUTABLE_PATH" | awk '{print $1}')
 
-if [ ! -f "$EXECUTABLE_PATH" ]; then
+if [ ! -f "$EJECUTABLE" ]; then
   echo "The executable does not exist in the specified location."
   exit 1
 fi
