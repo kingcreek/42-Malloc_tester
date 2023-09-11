@@ -22,14 +22,15 @@ curl -L -o "$HOME/$FOLDER/malloc_tester.sh" "https://github.com/kingcreek/42-Mal
 
 chmod +x "$HOME/$FOLDER/malloc_tester.sh"
 
-if [ "$SO" == "linux" ]; then
+if [ "$OSTYPE" == "linux-gnu"* ]; then
 	echo "alias malloc_tester=\"$HOME/$FOLDER/malloc_tester.sh\"" >> "$HOME/.bashrc"  
 	echo "alias king=\"$HOME/$FOLDER/malloc_tester.sh\"" >> "$HOME/.bashrc"
 	source "$HOME/.bashrc"
-elif [ "$SO" == "macos" ]; then
+elif [ "$OSTYPE" == "darwin"* ]; then
 	echo "alias malloc_tester=\"$HOME/$FOLDER/malloc_tester.sh\"" >> "$HOME/.zshrc"  
 	echo "alias king=\"$HOME/$FOLDER/malloc_tester.sh\"" >> "$HOME/.zshrc"
-	source "$HOME/.zshrc"
+	source "$HOME/.bashrc"
+	#source "$HOME/.zshrc"
 fi
 
 
