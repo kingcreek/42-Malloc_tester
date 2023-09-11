@@ -22,15 +22,21 @@ curl -L -o "$HOME/$FOLDER/malloc_tester.sh" "https://github.com/kingcreek/42-Mal
 
 chmod +x "$HOME/$FOLDER/malloc_tester.sh"
 
-if [ "$OSTYPE" == "linux-gnu"* ]; then
-	echo "alias malloc_tester=\"$HOME/$FOLDER/malloc_tester.sh\"" >> "$HOME/.bashrc"  
-	echo "alias king=\"$HOME/$FOLDER/malloc_tester.sh\"" >> "$HOME/.bashrc"
-	source "$HOME/.bashrc"
-elif [ "$OSTYPE" == "darwin"* ]; then
-	echo "mac os"
-	echo "alias malloc_tester=\"$HOME/$FOLDER/malloc_tester.sh\"" >> "$HOME/.zshrc"  
-	echo "alias king=\"$HOME/$FOLDER/malloc_tester.sh\"" >> "$HOME/.zshrc"
-	source "$HOME/.zshrc"
+RC_FILE="$HOME/.zshrc"
+
+if [ "$(uname)" != "Darwin" ]; then
+	RC_FILE="$HOME/.bashrc"
+	if [[ -f "$HOME/.zshrc" ]]; then
+		RC_FILE="$HOME/.zshrc"
+	fi
+fi
+
+if ! grep "malloc_tester=" "$RC_FILE" &> /dev/null; then
+	printf "\nalias malloc_tester=%s/malloc_tester.sh\n" "$HOME/$FOLDER" >> "$RC_FILE"
+fi
+
+if ! grep "king=" "$RC_FILE" &> /dev/null; then
+	printf "\nalias king=%s/malloc_tester.sh\n" "$HOME/$FOLDER" >> "$RC_FILE"
 fi
 
 
