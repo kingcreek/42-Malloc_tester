@@ -27,10 +27,10 @@ if [ "$OSTYPE" == "linux-gnu"* ]; then
 	echo "alias king=\"$HOME/$FOLDER/malloc_tester.sh\"" >> "$HOME/.bashrc"
 	source "$HOME/.bashrc"
 elif [ "$OSTYPE" == "darwin"* ]; then
+	echo "mac os"
 	echo "alias malloc_tester=\"$HOME/$FOLDER/malloc_tester.sh\"" >> "$HOME/.zshrc"  
 	echo "alias king=\"$HOME/$FOLDER/malloc_tester.sh\"" >> "$HOME/.zshrc"
-	source "$HOME/.bashrc"
-	#source "$HOME/.zshrc"
+	source "$HOME/.zshrc"
 fi
 
 
