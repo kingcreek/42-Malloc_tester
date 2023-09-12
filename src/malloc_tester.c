@@ -6,7 +6,7 @@
 /*   By: imurugar <imurugar@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/08 10:12:07 by imurugar          #+#    #+#             */
-/*   Updated: 2023/09/10 23:21:22 by imurugar         ###   ########.fr       */
+/*   Updated: 2023/09/12 11:14:17 by imurugar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -160,6 +160,7 @@ INTERPOSE_C(void *, malloc, (size_t sz), (sz))
 
 INTERPOSE_C_VOID(free, (void *p), (p))
 {
+	/*
 	if (ignore_malloc == 0)
 	{
 		void *caller = NULL;
@@ -179,5 +180,7 @@ INTERPOSE_C_VOID(free, (void *p), (p))
 			freed_bytes += malloc_usable_size(p);
 		Real__free(strings);
 	}
+	*/
+	freed_bytes += malloc_usable_size(p);
 	Real__free(p);
 }

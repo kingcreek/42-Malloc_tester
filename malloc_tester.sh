@@ -1,5 +1,7 @@
 #!/bin/bash
 
+##############################################################################################
+
 show_welcome_message() {
   echo " _    _                                _    ";
   echo "| |  (_)                              | |   ";
@@ -13,6 +15,9 @@ show_welcome_message() {
 
 show_welcome_message
 
+##############################################################################################
+
+##############################################################################################
 FOLDER=".malloc_tester"
 ADDRESSFILE=$HOME/$FOLDER/address.0x00
 TRACE_FILE="$HOME/$FOLDER/trace"
@@ -27,16 +32,85 @@ else
   echo "Unsupported operating system."
   exit 1
 fi
+##############################################################################################
 
-#echo "Downloading the shared library from $REMOTE_LIBRARY_URL..."
-#curl -L -o $LOCAL_LIBRARY_NAME $REMOTE_LIBRARY_URL
+##############################################################################################
 
-#if [ $? -ne 0 ]; then
-#  echo "Error downloading shared library."
-#  exit 1
-#fi
+function add_flags() {
+	local makefile="$1"
+	sed -i 's/\(-Werror\)/\1 -g -rdynamic/' "$makefile"
+}
+# Remove flags in Makefile
+function remove_flags() {
+	local makefile="$1"
+	sed -i 's/ -g -rdynamic//' "$makefile"
+}
+# makefile array
+makefiles=()
+# Process makefile in current path and subdirectories
+function process_directory() {
+	local directorio="$1"
+	local makefile
+	makefile="$directorio/Makefile"
+	if [ -f "$makefile" ]; then
+		add_flags "$makefile"
+		makefiles+=("$makefile")
+	fi
+	for subdir in "$directorio"/*/; do
+		if [ -d "$subdir" ]; then
+			process_directory "$subdir"
+		fi
+	done
+}
+
+read -e -p "Do you want the flags (-g -rdynamic) to be added to your makefile? The program will be compiled and the flags will be removed later automatically.\n y/n: " PROCESSMAKE
+
+if [[ "$PROCESSMAKE" == "y" || "$PROCESSMAKE" == "Y" ]]; then
+	echo -e  "processing make"
+	#add flags
+	process_directory "$(pwd)"
+	# do make
+	make
+	# Remove flags in all makefiles
+	for makefile in "${makefiles[@]}"; do
+		remove_flags "$makefile"
+	done
+fi
+
+##############################################################################################
+
+##############################################################################################
+
 echo -e "\nMake sure that the program is compiled with the "-g" flag as well as the libraries that you use (ft_printf, libft..) for a correct operation of the tester"
 read -e -p "Enter the path of the executable: " EXECUTABLE_PATH
+
+##############################################################################################
+#EXECUTABLE_PATH=""
+
+#possible_executables=("a.out" "anotherprogram" "yetanotherprogram")
+# Función para verificar si existe un archivo con un nombre específico
+#function find_executable() {
+#    local name="$1"
+#    if [ -f "$name" ]; then
+#        EXECUTABLE_PATH="./$name"
+#    fi
+#}
+
+# Verifica si existe alguno de los posibles ejecutables
+#for name in "${possible_executables[@]}"; do
+#    find_executable "$name"
+#    if [ -n "$EXECUTABLE_PATH" ]; then
+#        break
+#    fi
+#done
+
+# Si se encontró un ejecutable, muestra su nombre
+#if [ -n "$EXECUTABLE_PATH" ]; then
+#    echo "Ejecutable encontrado: $EXECUTABLE_PATH"
+#else
+#    echo "Debes estar en un proyecto válido."
+#fi
+##############################################################################################
 
 if [[ "$EXECUTABLE_PATH" == "leaks "* ]]; then
   PROGRAM_NAME=$(echo "$EXECUTABLE_PATH" | cut -d' ' -f2)
@@ -63,7 +137,7 @@ echo "Launch $EXECUTABLE_PATH with lib injected..."
 #}
 #trap 'handle_sigint' INT
 
-ok_flag=1
+ok_flag=99
 
 while true; do
 
@@ -82,15 +156,20 @@ while true; do
 	elif [[ "$program_output" == *"seg fault handle"* ]]; then
 		ok_flag=0
     	break
+	elif [[ "$program_output" == *"pointer being freed was not allocated"* ]]; then
+		ok_flag=1
+    	break
   	elif [[ "$program_output" == *"Finished tester"* ]]; then
     	break
   	fi
 done
 
-if [ $ok_flag -eq 1 ]; then
+if [ $ok_flag -eq 99 ]; then
   echo -e "\n\e[32mOK\e[0m"
+elif [ $ok_flag -eq 1 ]; then
+	echo -e "\n\e[31mKO (double free)\e[0m"
 else
-	echo -e "\n\e[31mKO\e[0m"
+	echo -e "\n\e[31mKO (segfault)\e[0m"
 	if [ -f "$TRACE_FILE" ]; then
 		echo -e "\n----TRACE----"
 
@@ -115,3 +194,5 @@ rm -f $ADDRESSFILE
 rm -f $TRACE_FILE
 
 echo -e "\nFinish."
+
+##############################################################################################
