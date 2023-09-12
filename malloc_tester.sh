@@ -20,7 +20,7 @@ FOLDER=".malloc_tester"
 ##############################################################################################
 
 ##############################################################################################
-CURRENTVERSION="2"
+CURRENTVERSION="1"
 
 github_url="https://github.com/kingcreek/42-Malloc_tester/raw/main/version.txt"
 if ! curl -s -L "$github_url" | grep -q $CURRENTVERSION; then
@@ -36,12 +36,12 @@ ADDRESSFILE=$HOME/$FOLDER/address.0x00
 TRACE_FILE="$HOME/$FOLDER/trace"
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-	LOCAL_LIBRARY_NAME="./malloc_tester.so"
-	#LOCAL_LIBRARY_NAME="$HOME/$FOLDER/malloc_tester.so"
+	#LOCAL_LIBRARY_NAME="./malloc_tester.so"
+	LOCAL_LIBRARY_NAME="$HOME/$FOLDER/malloc_tester.so"
 	LOAD_FUNCTION="LD_PRELOAD"
 elif [[ "$OSTYPE" == "darwin"* ]]; then
-	LOCAL_LIBRARY_NAME="./malloc_tester.dylib"
-	#LOCAL_LIBRARY_NAME="$HOME/$FOLDER/malloc_tester.dylib"
+	#LOCAL_LIBRARY_NAME="./malloc_tester.dylib"
+	LOCAL_LIBRARY_NAME="$HOME/$FOLDER/malloc_tester.dylib"
 	LOAD_FUNCTION="DYLD_INSERT_LIBRARIES"
 else
   echo "Unsupported operating system."
