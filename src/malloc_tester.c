@@ -6,13 +6,12 @@
 /*   By: imurugar <imurugar@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/08 10:12:07 by imurugar          #+#    #+#             */
-/*   Updated: 2023/09/12 11:14:17 by imurugar         ###   ########.fr       */
+/*   Updated: 2023/09/12 16:06:01 by imurugar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #define _GNU_SOURCE
 
-// #include "../inc/stacktrace.h"
 #include "../inc/malloc_tester.h"
 #include "../inc/interpose.h"
 
@@ -40,22 +39,28 @@ void segfault_handler(int signo)
 
 void close_handler(int signo)
 {
+	fprintf(stdout, "Finished tester\n");
+	/*
 	fprintf(stdout, "Finished tester\n\
 	Total memory allocated by you:%zu\n\
 	Total memory freed by you:%zu\n\
 	Total unreleased memory and you pray for the system to release it:%zu"\
 	,allocated_bytes, freed_bytes, allocated_bytes - freed_bytes);
+	*/
 }
 
 void program_finish()
 {
 	lock_mutex_malloc();
 	if (malloc_counter == 0)
+		fprintf(stdout, "Finished tester\n");
+		/*
 		fprintf(stdout, "Finished tester\n\
 		Total memory allocated by you:%zu\n\
 		Total memory freed by you:%zu\n\
 		Total unreleased memory and you pray for the system to release it:%zu"\
 		,allocated_bytes, freed_bytes, allocated_bytes - freed_bytes);
+		*/
 	unlock_mutex_malloc();
 }
 
@@ -81,11 +86,14 @@ INTERPOSE_C_VOID(exit, (int status), (status))
 {
 	lock_mutex_malloc();
 	if (malloc_counter == 0)
+		fprintf(stdout, "Finished tester\n");
+		/*
 		fprintf(stdout, "Finished tester\n\
 		Total memory allocated by you:%zu\n\
 		Total memory freed by you:%zu\n\
 		Total unreleased memory and you pray for the system to release it:%zu"\
 		,allocated_bytes, freed_bytes, allocated_bytes - freed_bytes);
+		*/
 	unlock_mutex_malloc();
 	Real__exit(status);
 }

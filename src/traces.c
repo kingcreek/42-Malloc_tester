@@ -6,7 +6,7 @@
 /*   By: imurugar <imurugar@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/08 10:12:02 by imurugar          #+#    #+#             */
-/*   Updated: 2023/09/10 21:41:02 by imurugar         ###   ########.fr       */
+/*   Updated: 2023/09/12 16:06:57 by imurugar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,6 +71,12 @@ void get_program_name(char *program_name)
 void get_trace()
 {
 	fprintf(stdout, "seg fault handle\n");
+	#ifdef __APPLE__
+		void *callstack[8] = {0};
+		size_t size = backtrace(callstack, sizeof(callstack) / sizeof(callstack[0]));
+		backtrace_symbols_fd(callstack, sizeof(callstack) / sizeof(callstack[0]), 1);
+	#else
+	
 	void *callstack[40] = {0};
 	char program_name[256] = {0};
 	char cmd[256] = {0};
@@ -80,10 +86,13 @@ void get_trace()
 	size_t i;
 
 	// trace file output
+	fprintf(stderr, "OAJSOSIDFOSDFMOSDFOD");
 	const char *home_dir = getenv("HOME");
 	if (home_dir != NULL)
 		snprintf(file_path, sizeof(file_path), "%s/.malloc_tester/trace", home_dir);
-		
+	
+	
+	
 	size = backtrace(callstack, sizeof(callstack) / sizeof(callstack[0]));
 	strings = backtrace_symbols(callstack, size);
 
@@ -117,4 +126,5 @@ void get_trace()
 		}
 	}
 	free(strings);
+	#endif
 }
