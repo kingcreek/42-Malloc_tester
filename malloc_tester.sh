@@ -15,10 +15,23 @@ show_welcome_message() {
 
 show_welcome_message
 
+FOLDER=".malloc_tester"
+
 ##############################################################################################
 
 ##############################################################################################
-FOLDER=".malloc_tester"
+CURRENTVERSION="2"
+
+github_url="https://github.com/kingcreek/42-Malloc_tester/raw/main/version.txt"
+if ! curl -s -L "$github_url" | grep -q $CURRENTVERSION; then
+  echo "UPDATING..."
+  bash -c "$(curl -fsSL https://github.com/kingcreek/42-Malloc_tester/raw/main/install.sh)"
+  exit
+fi
+##############################################################################################
+
+##############################################################################################
+
 ADDRESSFILE=$HOME/$FOLDER/address.0x00
 TRACE_FILE="$HOME/$FOLDER/trace"
 
@@ -66,7 +79,7 @@ function process_directory() {
 }
 
 #read -e -p "Do you want the flags (-g -rdynamic) to be added to your makefile? The program will be compiled and the flags will be removed later automatically.\n y/n: " PROCESSMAKE
-PROCESSMAKE = "n"
+PROCESSMAKE="n"
 if [[ "$PROCESSMAKE" == "y" || "$PROCESSMAKE" == "Y" ]]; then
 	echo -e  "processing make"
 	#add flags
