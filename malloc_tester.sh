@@ -23,11 +23,13 @@ ADDRESSFILE=$HOME/$FOLDER/address.0x00
 TRACE_FILE="$HOME/$FOLDER/trace"
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-  LOCAL_LIBRARY_NAME="$HOME/$FOLDER/malloc_tester.so"
-  LOAD_FUNCTION="LD_PRELOAD"
+	LOCAL_LIBRARY_NAME="./malloc_tester.so"
+	#LOCAL_LIBRARY_NAME="$HOME/$FOLDER/malloc_tester.so"
+	LOAD_FUNCTION="LD_PRELOAD"
 elif [[ "$OSTYPE" == "darwin"* ]]; then
-  LOCAL_LIBRARY_NAME="$HOME/$FOLDER/malloc_tester.dylib"
-  LOAD_FUNCTION="DYLD_INSERT_LIBRARIES"
+	LOCAL_LIBRARY_NAME="./malloc_tester.dylib"
+	#LOCAL_LIBRARY_NAME="$HOME/$FOLDER/malloc_tester.dylib"
+	LOAD_FUNCTION="DYLD_INSERT_LIBRARIES"
 else
   echo "Unsupported operating system."
   exit 1
@@ -63,8 +65,8 @@ function process_directory() {
 	done
 }
 
-read -e -p "Do you want the flags (-g -rdynamic) to be added to your makefile? The program will be compiled and the flags will be removed later automatically.\n y/n: " PROCESSMAKE
-
+#read -e -p "Do you want the flags (-g -rdynamic) to be added to your makefile? The program will be compiled and the flags will be removed later automatically.\n y/n: " PROCESSMAKE
+PROCESSMAKE = "n"
 if [[ "$PROCESSMAKE" == "y" || "$PROCESSMAKE" == "Y" ]]; then
 	echo -e  "processing make"
 	#add flags
@@ -141,8 +143,10 @@ ok_flag=99
 
 while true; do
 
-	rm -f $HOME/$FOLDER/trace
-	touch $HOME/$FOLDER/trace
+	if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+		rm -f $TRACE_FILE
+		touch $TRACE_FILE
+	fi
 	#program_output=$(eval "$LOAD_FUNCTION=./$LOCAL_LIBRARY_NAME $EXECUTABLE_PATH" 2>&1 | tee /dev/tty)
 	program_output=$(eval "$LOAD_FUNCTION=$LOCAL_LIBRARY_NAME $EXECUTABLE_PATH" | tee /dev/tty)
   	#eval "$LOAD_FUNCTION=./$LOCAL_LIBRARY_NAME $EXECUTABLE_PATH" < /dev/tty &
@@ -171,10 +175,9 @@ elif [ $ok_flag -eq 1 ]; then
 else
 	echo -e "\n\e[31mKO (segfault)\e[0m"
 	if [ -f "$TRACE_FILE" ]; then
-		echo -e "\n----TRACE----"
-
 		mapfile -t lines < "$TRACE_FILE"
 		num_lines=${#lines[@]}
+		echo -e "\n----TRACE----"
 		for ((i = 0; i < num_lines - 1; i++)); do
 			line="${lines[i]}"
 			result=$(eval "$line")
@@ -191,7 +194,9 @@ else
 fi
 
 rm -f $ADDRESSFILE
-rm -f $TRACE_FILE
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+	rm -f $TRACE_FILE
+fi
 
 echo -e "\nFinish."
 
