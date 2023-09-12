@@ -146,12 +146,6 @@ touch $ADDRESSFILE
 
 echo "Launch $EXECUTABLE_PATH with lib injected..."
 
-#handle_sigint() {
-#	echo $pid
-#	kill -INT $pid
-#}
-#trap 'handle_sigint' INT
-
 ok_flag=99
 
 while true; do
@@ -182,11 +176,11 @@ while true; do
 done
 
 if [ $ok_flag -eq 99 ]; then
-  echo -e "\n\e[32mOK\e[0m"
+  echo -e "\n\033[32mOK\033[0m\n"
 elif [ $ok_flag -eq 1 ]; then
-	echo -e "\n\e[31mKO (double free)\e[0m"
+	echo -e "\n\x1B[31mKO (double free)\x1B[0m"
 else
-	echo -e "\n\e[31mKO (segfault)\e[0m"
+	echo -e "\n\x1B[31mKO (Segfault)\x1B[0m"
 	if [ -f "$TRACE_FILE" ]; then
 		mapfile -t lines < "$TRACE_FILE"
 		num_lines=${#lines[@]}

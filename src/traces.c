@@ -12,6 +12,7 @@
 
 #include "../inc/malloc_tester.h"
 
+// mac atos -o a.out -l 0x100000000 0x1224
 // atos -o ./a.out -l 0x7fff5fc00000 - macOs ¿need relative or absolute addr? i dont know, u_u, try
 // addr2line -e ./a.out + 0x1224 - linux
 
@@ -71,12 +72,12 @@ void get_program_name(char *program_name)
 void get_trace()
 {
 	fprintf(stdout, "seg fault handle\n");
-	#ifdef __APPLE__
-		void *callstack[8] = {0};
-		size_t size = backtrace(callstack, sizeof(callstack) / sizeof(callstack[0]));
-		backtrace_symbols_fd(callstack, sizeof(callstack) / sizeof(callstack[0]), 1);
-	#else
-	
+#ifdef __APPLE__
+	void *callstack[8] = {0};
+	size_t size = backtrace(callstack, sizeof(callstack) / sizeof(callstack[0]));
+	backtrace_symbols_fd(callstack, sizeof(callstack) / sizeof(callstack[0]), 1);
+#else
+
 	void *callstack[40] = {0};
 	char program_name[256] = {0};
 	char cmd[256] = {0};
@@ -86,13 +87,10 @@ void get_trace()
 	size_t i;
 
 	// trace file output
-	fprintf(stderr, "OAJSOSIDFOSDFMOSDFOD");
 	const char *home_dir = getenv("HOME");
 	if (home_dir != NULL)
 		snprintf(file_path, sizeof(file_path), "%s/.malloc_tester/trace", home_dir);
-	
-	
-	
+
 	size = backtrace(callstack, sizeof(callstack) / sizeof(callstack[0]));
 	strings = backtrace_symbols(callstack, size);
 
@@ -105,26 +103,9 @@ void get_trace()
 		if (strstr(strings[i], program_name) != NULL)
 		{
 			generate_addr2line_command(strings[i], cmd, sizeof(cmd));
-			//fprintf(stdout, "%s\n", cmd);
 			write_in_file_simple(file_path, cmd);
-
-			/*
-			FILE *fp = popen(cmd, "r");
-			if (fp == NULL)
-			{
-				perror("Error al ejecutar addr2line");
-			}
-
-			char buffer[512];
-			while (fgets(buffer, sizeof(buffer), fp) != NULL)
-			{
-				printf("%s", buffer);
-			}
-
-			pclose(fp);
-			*/
 		}
 	}
 	free(strings);
-	#endif
+#endif
 }

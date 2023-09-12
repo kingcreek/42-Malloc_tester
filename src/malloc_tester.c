@@ -39,41 +39,49 @@ void segfault_handler(int signo)
 
 void close_handler(int signo)
 {
-	fprintf(stdout, "Finished tester\n");
-	/*
-	fprintf(stdout, "Finished tester\n\
-	Total memory allocated by you:%zu\n\
-	Total memory freed by you:%zu\n\
-	Total unreleased memory and you pray for the system to release it:%zu"\
-	,allocated_bytes, freed_bytes, allocated_bytes - freed_bytes);
-	*/
+	// fprintf(stdout, "Finished tester\n");
+
+	if (malloc_counter == 0)
+		fprintf(stdout, "Finished tester\n\
+		Total memory allocated by you:%zu\n\
+		Total memory freed by you:%zu\n\
+		Total unreleased memory and you pray for the system to release it:%zu\n",
+				allocated_bytes, freed_bytes, allocated_bytes - freed_bytes);
 }
 
 void program_finish()
 {
 	lock_mutex_malloc();
+	// if (malloc_counter == 0)
+	//	fprintf(stdout, "Finished tester\n");
+
 	if (malloc_counter == 0)
-		fprintf(stdout, "Finished tester\n");
-		/*
 		fprintf(stdout, "Finished tester\n\
 		Total memory allocated by you:%zu\n\
 		Total memory freed by you:%zu\n\
-		Total unreleased memory and you pray for the system to release it:%zu"\
-		,allocated_bytes, freed_bytes, allocated_bytes - freed_bytes);
-		*/
+		Total unreleased memory and you pray for the system to release it:%zu\n",
+				allocated_bytes, freed_bytes, allocated_bytes - freed_bytes);
+
 	unlock_mutex_malloc();
 }
 
 __attribute__((constructor)) static void init()
 {
 	lock_mutex_malloc();
-	signal(SIGSEGV, segfault_handler);
+	// signal(SIGSEGV, segfault_handler);
+
+	struct sigaction sa;
+	sa.sa_handler = segfault_handler;
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = 0;
+	sigaction(SIGSEGV, &sa, NULL);
+
 	signal(SIGINT, close_handler);
 	atexit(program_finish);
 	const char *home_dir = getenv("HOME");
 	if (home_dir != NULL)
 		snprintf(file_path, sizeof(file_path), "%s/.malloc_tester/address.0x00", home_dir);
-	
+
 	ignore_malloc = 0;
 	allocated_bytes = 0;
 	freed_bytes = 0;
@@ -85,15 +93,16 @@ __attribute__((constructor)) static void init()
 INTERPOSE_C_VOID(exit, (int status), (status))
 {
 	lock_mutex_malloc();
+	// if (malloc_counter == 0)
+	//	fprintf(stdout, "Finished tester\n");
+
 	if (malloc_counter == 0)
-		fprintf(stdout, "Finished tester\n");
-		/*
 		fprintf(stdout, "Finished tester\n\
 		Total memory allocated by you:%zu\n\
 		Total memory freed by you:%zu\n\
-		Total unreleased memory and you pray for the system to release it:%zu"\
-		,allocated_bytes, freed_bytes, allocated_bytes - freed_bytes);
-		*/
+		Total unreleased memory and you pray for the system to release it:%zu\n",
+				allocated_bytes, freed_bytes, allocated_bytes - freed_bytes);
+
 	unlock_mutex_malloc();
 	Real__exit(status);
 }
@@ -110,14 +119,15 @@ INTERPOSE_C(void *, malloc, (size_t sz), (sz))
 		{
 			unlock_mutex_malloc();
 			void *result = Real__malloc(sz);
-			//allocated_bytes += malloc_usable_size(result);
+			// allocated_bytes += malloc_usable_size(result);
 			return result;
 		}
 		caller = callstack[1];
 
-		//Dl_info info;
-		//if (dladdr(callstack[1], &info) && strstr(info.dli_fname, program_name) != NULL) {
-		if (caller < (void *)0x7f0000000000) {
+		// Dl_info info;
+		// if (dladdr(callstack[1], &info) && strstr(info.dli_fname, program_name) != NULL) {
+		if (caller < (void *)0x7f0000000000)
+		{
 			//   Skip previus malloc function calls
 			/*
 			for (int i = 0; i < size; i++)
@@ -162,33 +172,55 @@ INTERPOSE_C(void *, malloc, (size_t sz), (sz))
 		unlock_mutex_malloc();
 	}
 	void *result = Real__malloc(sz);
-	//allocated_bytes += malloc_usable_size(result);
+	// allocated_bytes += malloc_usable_size(result);
 	return result;
 }
 
 INTERPOSE_C_VOID(free, (void *p), (p))
 {
-	/*
+
 	if (ignore_malloc == 0)
 	{
+		// lock_mutex_malloc();
 		void *caller = NULL;
 		int size = backtrace(callstack, sizeof(callstack) / sizeof(callstack[0]));
 		char **strings = backtrace_symbols(callstack, size);
 		if (size <= 0)
 		{
 			unlock_mutex_malloc();
-			//freed_bytes += malloc_usable_size(p);
+			// freed_bytes += malloc_usable_size(p);
 			Real__free(p);
 			Real__free(strings);
+			unlock_mutex_malloc();
 			return;
 		}
 		caller = callstack[3];
-
-		if (strstr(strings[4], program_name) != NULL)
-			freed_bytes += malloc_usable_size(p);
+		/*
+		for (int i = 0; i < size; i++)
+		{
+			Dl_info info;
+			if (dladdr(callstack[i], &info))
+			{
+					// dladdr(callstack[i], &info);
+					fprintf(stderr, "Function number: %d\n", i);
+					fprintf(stderr, "Function Name: %s\n", info.dli_sname);
+					fprintf(stderr, "Library Path: %s\n", info.dli_fname);
+					fprintf(stderr, "Library Base Address: %p\n", info.dli_fbase);
+					fprintf(stderr, "Symbol Address: %p\n", info.dli_saddr);
+					fprintf(stderr, "-----------------\n\n");
+			}
+		}
+		*/
+		if (caller < (void *)0x7f0000000000)
+		{
+			if (strstr(strings[1], program_name) != NULL)
+				freed_bytes += malloc_usable_size(p);
+			// fprintf(stderr, "freed_bytes: %zu\n", freed_bytes);
+		}
 		Real__free(strings);
 	}
-	*/
-	freed_bytes += malloc_usable_size(p);
+
+	// freed_bytes += malloc_usable_size(p);
+	// unlock_mutex_malloc();
 	Real__free(p);
 }
