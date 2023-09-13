@@ -6,7 +6,7 @@
 /*   By: imurugar <imurugar@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/08 10:12:07 by imurugar          #+#    #+#             */
-/*   Updated: 2023/09/13 13:51:43 by imurugar         ###   ########.fr       */
+/*   Updated: 2023/09/13 15:51:41 by imurugar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -180,7 +180,7 @@ INTERPOSE_C(void *, malloc, (size_t sz), (sz))
 
 INTERPOSE_C_VOID(free, (void *p), (p))
 {
-
+	/*
 	if (ignore_malloc == 0)
 	{
 		// lock_mutex_malloc();
@@ -197,22 +197,6 @@ INTERPOSE_C_VOID(free, (void *p), (p))
 			return;
 		}
 		caller = callstack[3];
-		/*
-		for (int i = 0; i < size; i++)
-		{
-			Dl_info info;
-			if (dladdr(callstack[i], &info))
-			{
-					// dladdr(callstack[i], &info);
-					fprintf(stderr, "Function number: %d\n", i);
-					fprintf(stderr, "Function Name: %s\n", info.dli_sname);
-					fprintf(stderr, "Library Path: %s\n", info.dli_fname);
-					fprintf(stderr, "Library Base Address: %p\n", info.dli_fbase);
-					fprintf(stderr, "Symbol Address: %p\n", info.dli_saddr);
-					fprintf(stderr, "-----------------\n\n");
-			}
-		}
-		*/
 		if (caller < (void *)0x7f0000000000)
 		{
 			if (strstr(strings[1], program_name) != NULL)
@@ -224,5 +208,6 @@ INTERPOSE_C_VOID(free, (void *p), (p))
 
 	// freed_bytes += malloc_usable_size(p);
 	// unlock_mutex_malloc();
+	*/
 	Real__free(p);
 }
