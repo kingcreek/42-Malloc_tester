@@ -6,7 +6,7 @@
 /*   By: imurugar <imurugar@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/08 10:12:07 by imurugar          #+#    #+#             */
-/*   Updated: 2023/09/12 16:06:01 by imurugar         ###   ########.fr       */
+/*   Updated: 2023/09/13 13:51:43 by imurugar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,13 +68,15 @@ void program_finish()
 __attribute__((constructor)) static void init()
 {
 	lock_mutex_malloc();
-	// signal(SIGSEGV, segfault_handler);
+	signal(SIGSEGV, segfault_handler);
 
+	/*
 	struct sigaction sa;
 	sa.sa_handler = segfault_handler;
 	sigemptyset(&sa.sa_mask);
 	sa.sa_flags = 0;
 	sigaction(SIGSEGV, &sa, NULL);
+	*/
 
 	signal(SIGINT, close_handler);
 	atexit(program_finish);

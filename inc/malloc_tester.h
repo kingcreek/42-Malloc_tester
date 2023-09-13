@@ -6,7 +6,7 @@
 /*   By: imurugar <imurugar@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/08 10:12:50 by imurugar          #+#    #+#             */
-/*   Updated: 2023/09/10 21:23:16 by imurugar         ###   ########.fr       */
+/*   Updated: 2023/09/13 13:51:19 by imurugar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 #include <execinfo.h>
 #include <unistd.h>
 #include <string.h>
+#include <signal.h>
 #include <fcntl.h>
 #include <stdint.h>
 #include <sys/wait.h>
