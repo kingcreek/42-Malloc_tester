@@ -6,7 +6,7 @@
 /*   By: imurugar <imurugar@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/08 10:12:07 by imurugar          #+#    #+#             */
-/*   Updated: 2023/09/13 15:51:41 by imurugar         ###   ########.fr       */
+/*   Updated: 2023/09/13 16:31:27 by imurugar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,11 +42,14 @@ void close_handler(int signo)
 	// fprintf(stdout, "Finished tester\n");
 
 	if (malloc_counter == 0)
+		fprintf(stdout, "Finished tester\n");
+		/*
 		fprintf(stdout, "Finished tester\n\
 		Total memory allocated by you:%zu\n\
 		Total memory freed by you:%zu\n\
 		Total unreleased memory and you pray for the system to release it:%zu\n",
 				allocated_bytes, freed_bytes, allocated_bytes - freed_bytes);
+		*/
 }
 
 void program_finish()
@@ -56,11 +59,14 @@ void program_finish()
 	//	fprintf(stdout, "Finished tester\n");
 
 	if (malloc_counter == 0)
+		fprintf(stdout, "Finished tester\n");
+		/*
 		fprintf(stdout, "Finished tester\n\
 		Total memory allocated by you:%zu\n\
 		Total memory freed by you:%zu\n\
 		Total unreleased memory and you pray for the system to release it:%zu\n",
 				allocated_bytes, freed_bytes, allocated_bytes - freed_bytes);
+		*/
 
 	unlock_mutex_malloc();
 }
@@ -99,11 +105,14 @@ INTERPOSE_C_VOID(exit, (int status), (status))
 	//	fprintf(stdout, "Finished tester\n");
 
 	if (malloc_counter == 0)
+		fprintf(stdout, "Finished tester\n");
+		/*
 		fprintf(stdout, "Finished tester\n\
 		Total memory allocated by you:%zu\n\
 		Total memory freed by you:%zu\n\
 		Total unreleased memory and you pray for the system to release it:%zu\n",
 				allocated_bytes, freed_bytes, allocated_bytes - freed_bytes);
+		*/
 
 	unlock_mutex_malloc();
 	Real__exit(status);
