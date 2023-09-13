@@ -39,6 +39,6 @@ if ! grep "king=" "$RC_FILE" &> /dev/null; then
 	printf "\nalias king=%s/malloc_tester.sh\n" "$HOME/$FOLDER" >> "$RC_FILE"
 fi
 
-source "$RC_FILE"
+exec "$SHELL"
 
 echo "Configuration completed. You can run 'malloc_tester' to run the program."
