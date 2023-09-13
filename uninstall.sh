@@ -12,7 +12,8 @@ fi
 sed -i'.bak' '/^alias malloc_tester=/d' $RC_FILE
 sed -i'.bak' '/^alias king=/d' $RC_FILE
 
-source "$RC_FILE"
 
 rm -rf "$HOME/.malloc_tester"
 echo "Uninstallation completed."
+
+exec "$SHELL"
