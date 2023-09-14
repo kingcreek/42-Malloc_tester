@@ -20,7 +20,7 @@ FOLDER=".malloc_tester"
 ##############################################################################################
 
 ##############################################################################################
-CURRENTVERSION="4"
+CURRENTVERSION="0.1"
 
 github_url="https://github.com/kingcreek/42-Malloc_tester/raw/main/version.txt"
 if ! curl -s -L "$github_url" | grep -q $CURRENTVERSION; then
@@ -36,9 +36,9 @@ ADDRESSFILE=$HOME/$FOLDER/address.0x00
 TRACE_FILE="$HOME/$FOLDER/trace"
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-	LOCAL_LIBRARY_NAME="./malloc_tester.so"
+	# LOCAL_LIBRARY_NAME="./malloc_tester.so"
 	LOCAL_LIBRARY_NAME="$HOME/$FOLDER/malloc_tester.so"
-	# LOAD_FUNCTION="LD_PRELOAD"
+	LOAD_FUNCTION="LD_PRELOAD"
 elif [[ "$OSTYPE" == "darwin"* ]]; then
 	# LOCAL_LIBRARY_NAME="./malloc_tester.dylib"
 	LOCAL_LIBRARY_NAME="$HOME/$FOLDER/malloc_tester.dylib"
@@ -156,8 +156,8 @@ ok_flag=99
 while true; do
 
 	# if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-		rm -f $TRACE_FILE
-		touch $TRACE_FILE
+	rm -f $TRACE_FILE
+	touch $TRACE_FILE
 	# fi
 	#program_output=$(eval "$LOAD_FUNCTION=./$LOCAL_LIBRARY_NAME $EXECUTABLE_PATH" 2>&1 | tee /dev/tty)
 	program_output=$(eval "$LOAD_FUNCTION=$LOCAL_LIBRARY_NAME $EXECUTABLE_PATH" | tee /dev/tty)
@@ -189,20 +189,8 @@ else
 	if [ -f "$TRACE_FILE" ]; then
 		echo -e "\n----TRACE----"
     	while IFS= read -r line; do
-	  
       		result=$(eval "$line")
-	  		if [[ "$OSTYPE" == "darwin"* ]]; then
-	  			echo $result
-	  		elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
-      			IFS=$'\n' read -r -a result_lines <<< "$result"
-      			if [ "${#result_lines[@]}" -ge 2 ]; then
-        			if [[ ${result_lines[1]} != "??:?"* ]]; then
-          				echo "- ${result_lines[1]}"
-        			else
-          				echo "- This trace is not traceable, have you compiled with -g the program and libraries?"
-        			fi
-      			fi
-			fi
+	  		echo $result
     	done < "$TRACE_FILE"
 	fi
 fi
@@ -211,9 +199,7 @@ fi
 
 
 rm -f $ADDRESSFILE
-# if [[ "$OSTYPE" == "linux-gnu"* ]]; then
 rm -f $TRACE_FILE
-# fi
 
 echo -e "\nFinish."
 

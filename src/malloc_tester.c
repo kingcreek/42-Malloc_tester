@@ -74,7 +74,7 @@ void program_finish()
 	unlock_mutex_malloc();
 }
 
-static uint8_t alternate_stack[SIGSTKSZ];
+//static uint8_t alternate_stack[SIGSTKSZ];
 __attribute__((constructor)) static void init()
 {
 	lock_mutex_malloc();

@@ -26,6 +26,21 @@ bash -c "$(curl -fsSL https://github.com/kingcreek/42-Malloc_tester/raw/main/uni
 
 -Run `malloc_tester` in the terminal to start the program, type the name of your executable when prompted ex: `./a.out <optional args>`, you can add arguments if necessary
 
+# RUN WITH DOCKER
+
+You can build the Docker image using the Dockerfile from this repository. Follow these steps:
+
+1. Make sure you have Docker installed on your system.
+
+2. Open a terminal and run the following command to build the Docker image:
+
+```bash
+docker build -t nombre-de-la-imagen:etiqueta -f https://raw.github.com/kingcreek/42-Malloc_tester/main/Dockerfile .
+
+Run:
+```
+docker run -it --rm malloc_t malloc_tester
+```
 # Compilation
 
 Compile in Linux:

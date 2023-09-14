@@ -40,7 +40,7 @@ if ! grep "king=" "$RC_FILE" &> /dev/null; then
 fi
 
 if ! grep "amparette=" "$RC_FILE" &> /dev/null; then
-	printf "\nalias king=%s/malloc_tester.sh\n" "$HOME/$FOLDER" >> "$RC_FILE"
+	printf "\nalias amparette=%s/malloc_tester.sh\n" "$HOME/$FOLDER" >> "$RC_FILE"
 fi
 
 echo "Configuration completed. You can run 'malloc_tester' to run the program."
