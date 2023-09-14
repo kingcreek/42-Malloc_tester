@@ -2,7 +2,7 @@
 FROM ubuntu:latest
 
 # Instala las dependencias necesarias (curl y bash)
-RUN apt-get update && apt-get install -y curl bash libreadline-dev file
+RUN apt-get update && apt-get install -y curl bash libreadline-dev file binutils
 
 # Descarga el instalador desde GitHub
 RUN curl -fsSL -o /install.sh https://github.com/kingcreek/42-Malloc_tester/raw/main/install.sh
