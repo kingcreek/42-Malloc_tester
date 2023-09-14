@@ -35,11 +35,11 @@ You can build the Docker image using the Dockerfile from this repository. Follow
 2. Open a terminal and run the following command to build the Docker image:
 
 ```bash
-docker build -t nombre-de-la-imagen:etiqueta -f https://raw.github.com/kingcreek/42-Malloc_tester/main/Dockerfile .
+docker build -t malloc_t:last -f https://raw.github.com/kingcreek/42-Malloc_tester/main/Dockerfile .
 
 Run:
 ```
-docker run -it --rm malloc_t malloc_tester
+docker run -it --rm -v /path/to/your/program:/program_name malloc_t
 ```
 # Compilation
 
