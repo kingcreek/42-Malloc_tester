@@ -10,10 +10,16 @@ It has another function such as showing the trace in case a poorly handled mallo
 I hope it helps!!
 
 # INSTALL
-`bash -c "$(curl -fsSL https://github.com/kingcreek/42-Malloc_tester/raw/main/install.sh)"`
+```
+bash -c "$(curl -fsSL https://github.com/kingcreek/42-Malloc_tester/raw/main/install.sh)"
+```
+
+The .malloc_tester folder will be under your `$HOME` directory (`/Users/<your_username>/`)
 
 # UNINSTALL
-`bash -c "$(curl -fsSL https://github.com/kingcreek/42-Malloc_tester/raw/main/uninstall.sh)"`
+```
+bash -c "$(curl -fsSL https://github.com/kingcreek/42-Malloc_tester/raw/main/uninstall.sh)"
+```
 
 # USAGE
 -Make sure that your program and its libraries, if you use any (ft_printf, libft...) have been compiled with the `-g` flag
