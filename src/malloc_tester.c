@@ -6,7 +6,7 @@
 /*   By: imurugar <imurugar@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/08 10:12:07 by imurugar          #+#    #+#             */
-/*   Updated: 2023/09/13 16:31:27 by imurugar         ###   ########.fr       */
+/*   Updated: 2023/09/14 19:51:23 by imurugar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,12 +29,15 @@ char program_name[512] = {0};
 static void lock_mutex_malloc() { ignore_malloc = 1; }
 static void unlock_mutex_malloc() { ignore_malloc = 0; }
 
-void segfault_handler(int signo)
+void segfault_handler(int sig)
 {
-	lock_mutex_malloc();
-	if (malloc_counter != 0)
-		get_trace();
-	exit(139);
+	
+		write(1, "segmentation fault\n", 19);
+		lock_mutex_malloc();
+		if (malloc_counter != 0)
+			get_trace();
+		exit(139);
+	
 }
 
 void close_handler(int signo)
@@ -71,11 +74,44 @@ void program_finish()
 	unlock_mutex_malloc();
 }
 
+static uint8_t alternate_stack[SIGSTKSZ];
 __attribute__((constructor)) static void init()
 {
 	lock_mutex_malloc();
 	signal(SIGSEGV, segfault_handler);
+	
+	/* setup alternate stack */
+    // {
+    //   //stack_t ss = {};
+    //   /* malloc is usually used here, I'm not 100% sure my static allocation
+    //      is valid but it seems to work just fine. */
+	// 	 /*
+    //   ss.ss_sp = (void*)alternate_stack;
+    //   ss.ss_size = SIGSTKSZ;
+    //   ss.ss_flags = 0;
+	//   */
 
+    //   //if (sigaltstack(&ss, NULL) != 0) { err(1, "sigaltstack"); }
+    // }
+
+    // /* register our signal handlers */
+    // {
+    //   struct sigaction sig_action = {};
+    //   sig_action.sa_sigaction = segfault_handler;
+    //   sigemptyset(&sig_action.sa_mask);
+
+    //   #ifdef __APPLE__
+    //       /* for some reason we backtrace() doesn't work on osx
+    //          when we use an alternate stack */
+    //       sig_action.sa_flags = SA_SIGINFO;
+    //   #else
+    //       sig_action.sa_flags = SA_SIGINFO | SA_ONSTACK;
+    //   #endif
+
+    //   if (sigaction(SIGSEGV, &sig_action, NULL) != 0) { err(1, "sigaction"); }
+    //   if (sigaction(SIGINT,  &sig_action, NULL) != 0) { err(1, "sigaction"); }
+    // }
+	
 	/*
 	struct sigaction sa;
 	sa.sa_handler = segfault_handler;
@@ -94,7 +130,7 @@ __attribute__((constructor)) static void init()
 	allocated_bytes = 0;
 	freed_bytes = 0;
 	malloc_counter = 0;
-	get_program_name(program_name);
+	get_program_name(program_name, sizeof(program_name));
 	unlock_mutex_malloc();
 }
 

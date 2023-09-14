@@ -20,7 +20,7 @@ FOLDER=".malloc_tester"
 ##############################################################################################
 
 ##############################################################################################
-CURRENTVERSION="3"
+CURRENTVERSION="4"
 
 github_url="https://github.com/kingcreek/42-Malloc_tester/raw/main/version.txt"
 if ! curl -s -L "$github_url" | grep -q $CURRENTVERSION; then
@@ -36,11 +36,11 @@ ADDRESSFILE=$HOME/$FOLDER/address.0x00
 TRACE_FILE="$HOME/$FOLDER/trace"
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-	#LOCAL_LIBRARY_NAME="./malloc_tester.so"
+	LOCAL_LIBRARY_NAME="./malloc_tester.so"
 	LOCAL_LIBRARY_NAME="$HOME/$FOLDER/malloc_tester.so"
-	LOAD_FUNCTION="LD_PRELOAD"
+	# LOAD_FUNCTION="LD_PRELOAD"
 elif [[ "$OSTYPE" == "darwin"* ]]; then
-	#LOCAL_LIBRARY_NAME="./malloc_tester.dylib"
+	# LOCAL_LIBRARY_NAME="./malloc_tester.dylib"
 	LOCAL_LIBRARY_NAME="$HOME/$FOLDER/malloc_tester.dylib"
 	LOAD_FUNCTION="DYLD_INSERT_LIBRARIES"
 else
@@ -155,10 +155,10 @@ ok_flag=99
 
 while true; do
 
-	if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+	# if [[ "$OSTYPE" == "linux-gnu"* ]]; then
 		rm -f $TRACE_FILE
 		touch $TRACE_FILE
-	fi
+	# fi
 	#program_output=$(eval "$LOAD_FUNCTION=./$LOCAL_LIBRARY_NAME $EXECUTABLE_PATH" 2>&1 | tee /dev/tty)
 	program_output=$(eval "$LOAD_FUNCTION=$LOCAL_LIBRARY_NAME $EXECUTABLE_PATH" | tee /dev/tty)
   	#eval "$LOAD_FUNCTION=./$LOCAL_LIBRARY_NAME $EXECUTABLE_PATH" < /dev/tty &
@@ -169,7 +169,7 @@ while true; do
   	if [ $program_result -eq 139 ]; then
     	ok_flag=0
     	break
-	elif [[ "$program_output" == *"seg fault handle"* ]]; then
+	elif [[ "$program_output" == *"segmentation fault"* ]]; then
 		ok_flag=0
     	break
 	elif [[ "$program_output" == *"pointer being freed was not allocated"* ]]; then
@@ -183,32 +183,37 @@ done
 if [ $ok_flag -eq 99 ]; then
   echo -e "\n\033[32mOK\033[0m\n"
 elif [ $ok_flag -eq 1 ]; then
-	echo -e "\n\x1B[31mKO (double free)\x1B[0m"
+  echo -e "\n\x1B[31mKO (double free)\x1B[0m"
 else
 	echo -e "\n\x1B[31mKO (Segfault)\x1B[0m"
 	if [ -f "$TRACE_FILE" ]; then
-		mapfile -t lines < "$TRACE_FILE"
-		num_lines=${#lines[@]}
 		echo -e "\n----TRACE----"
-		for ((i = 0; i < num_lines - 1; i++)); do
-			line="${lines[i]}"
-			result=$(eval "$line")
-			mapfile -t result_lines <<< "$result"
-			if [ "${#result_lines[@]}" -ge 2 ]; then
-      			if [[ ${result_lines[1]} != "??:?"* ]]; then
-					echo "- ${result_lines[1]}"
-				else
-					echo "- This trace is not traceable, have you compiled with -g the program and libraries?"
-				fi
-    		fi
-		done
+    	while IFS= read -r line; do
+	  
+      		result=$(eval "$line")
+	  		if [[ "$OSTYPE" == "darwin"* ]]; then
+	  			echo $result
+	  		elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+      			IFS=$'\n' read -r -a result_lines <<< "$result"
+      			if [ "${#result_lines[@]}" -ge 2 ]; then
+        			if [[ ${result_lines[1]} != "??:?"* ]]; then
+          				echo "- ${result_lines[1]}"
+        			else
+          				echo "- This trace is not traceable, have you compiled with -g the program and libraries?"
+        			fi
+      			fi
+			fi
+    	done < "$TRACE_FILE"
 	fi
 fi
 
+
+
+
 rm -f $ADDRESSFILE
-if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-	rm -f $TRACE_FILE
-fi
+# if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+rm -f $TRACE_FILE
+# fi
 
 echo -e "\nFinish."
 

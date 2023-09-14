@@ -6,7 +6,7 @@
 /*   By: imurugar <imurugar@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/08 10:12:02 by imurugar          #+#    #+#             */
-/*   Updated: 2023/09/12 16:06:57 by imurugar         ###   ########.fr       */
+/*   Updated: 2023/09/14 19:52:02 by imurugar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,96 +16,136 @@
 // atos -o ./a.out -l 0x7fff5fc00000 - macOs ¿need relative or absolute addr? i dont know, u_u, try
 // addr2line -e ./a.out + 0x1224 - linux
 
-void generate_addr2line_command(const char *input, char *output, size_t output_size)
-{
-	char program_name[256];
-	unsigned long long address;
+void get_program_name(char *program_name, size_t size) {
+    // Utiliza getprogname() si está disponible (disponible en macOS)
+    const char *progname = getprogname();
+    if (progname != NULL) {
+        snprintf(program_name, size, "%s", progname);
+        return;
+    }
 
-	int result = sscanf(input, "%[^+(]%*c%llx", program_name, &address);
-
-	if (result != 2)
-	{
-		snprintf(output, output_size, "Error: Formato incorrecto.");
-	}
-	else
-	{
-#ifdef __APPLE__
-		/* apple does things differently... */
-		// sprintf(addr2line_cmd,"atos -o %.256s %p", program_name, addr);
-		snprintf(output, output_size, "atos -o %s %#llx", program_name, address);
-#else
-		snprintf(output, output_size, "addr2line -e %s + %#llx", program_name, address);
-#endif
-		// snprintf(output, output_size, "addr2line -e %s + %#llx", program_name, address);
-	}
+    // Si getprogname() no está disponible, intenta obtener el nombre del programa desde argv[0]
+    if (size > 0 && program_name != NULL) {
+        const char *argv0 = NULL;
+        extern char **environ;
+        if (environ != NULL) {
+            for (char **env = environ; *env != NULL; ++env) {
+                if (strncmp(*env, "_=", 2) == 0) {
+                    argv0 = *env + 2;
+                    break;
+                }
+            }
+        }
+        if (argv0 == NULL) {
+            argv0 = "unknown"; // Valor predeterminado si no se encuentra
+        }
+        snprintf(program_name, size, "%s", argv0);
+    }
 }
 
-void get_program_name(char *program_name)
+// void get_program_name(char *program_name)
+// {
+// 	pid_t my_pid = getpid();
+// 	char proc_path[254];
+// 	ssize_t len = 0;
+// 	int fd = -1;
+
+// 	snprintf(proc_path, sizeof(proc_path), "/proc/%d/cmdline", my_pid);
+// 	fprintf(stderr, "pname: %s\n", proc_path);
+
+// 	fd = open(proc_path, O_RDONLY);
+// 	if (fd == -1)
+// 	{
+// 		return;
+// 	}
+
+// 	size_t offset = 0;
+// 	while ((len = read(fd, program_name + offset, PROGRAM_NAME_BUFFER_SIZE - offset - 1)) > 0 && offset < PROGRAM_NAME_BUFFER_SIZE)
+// 	{
+// 		offset += len;
+// 	}
+
+// 	close(fd);
+
+// 	if (offset > 0)
+// 	{
+// 		fprintf(stderr, "pname: %s\n", program_name);
+// 		program_name[offset] = '\0';
+// 	}
+// }
+
+void addr2line(char const * const program_name, void const * const addr, char *file_path)
 {
-	pid_t my_pid = getpid();
-	char proc_path[254];
-	ssize_t len = 0;
-	int fd = -1;
+  char addr2line_cmd[512] = {0};
 
-	snprintf(proc_path, sizeof(proc_path), "/proc/%d/cmdline", my_pid);
-
-	fd = open(proc_path, O_RDONLY);
-	if (fd == -1)
-	{
-		return;
-	}
-
-	size_t offset = 0;
-	while ((len = read(fd, program_name + offset, PROGRAM_NAME_BUFFER_SIZE - offset - 1)) > 0 && offset < PROGRAM_NAME_BUFFER_SIZE)
-	{
-		offset += len;
-	}
-
-	close(fd);
-
-	if (offset > 0)
-	{
-		program_name[offset] = '\0';
-	}
+  /* have addr2line map the address to the relent line in the code */
+  #ifdef __APPLE__
+    /* apple does things differently... */
+    sprintf(addr2line_cmd,"atos -o %.256s %p", program_name, addr); 
+  #else
+    sprintf(addr2line_cmd,"addr2line -f -p -e %.256s %p", program_name, addr); 
+  #endif
+  //int ret = system(addr2line_cmd);
+  //return ret;
+  write_in_file_simple(file_path, addr2line_cmd);
 }
 
+#define MAX_STACK_FRAMES 64
+static void *stack_traces[MAX_STACK_FRAMES];
 void get_trace()
 {
-	fprintf(stdout, "seg fault handle\n");
-#ifdef __APPLE__
-	void *callstack[8] = {0};
-	size_t size = backtrace(callstack, sizeof(callstack) / sizeof(callstack[0]));
-	backtrace_symbols_fd(callstack, sizeof(callstack) / sizeof(callstack[0]), 1);
-#else
-
-	void *callstack[40] = {0};
 	char program_name[256] = {0};
-	char cmd[256] = {0};
+	int i, trace_size = 0;
+    char **messages = (char **)NULL;
 	char file_path[256] = {0};
-	size_t size;
-	char **strings;
-	size_t i;
 
-	// trace file output
 	const char *home_dir = getenv("HOME");
 	if (home_dir != NULL)
-		snprintf(file_path, sizeof(file_path), "%s/.malloc_tester/trace", home_dir);
+	 	snprintf(file_path, sizeof(file_path), "%s/.malloc_tester/trace", home_dir);
+    trace_size = backtrace(stack_traces, MAX_STACK_FRAMES);
+    messages = backtrace_symbols(stack_traces, trace_size);
 
-	size = backtrace(callstack, sizeof(callstack) / sizeof(callstack[0]));
-	strings = backtrace_symbols(callstack, size);
+	get_program_name(program_name, sizeof(program_name));
+    for (i = 0; i < trace_size; ++i) // we'll use this for now so you can see what's going on
+    {
+      addr2line(program_name, stack_traces[i], file_path);
+    }
+    if (messages) { free(messages); } 
+	
+// #ifdef __APPLE__
+// 	void *callstack[8] = {0};
+// 	size_t size = backtrace(callstack, sizeof(callstack) / sizeof(callstack[0]));
+// 	backtrace_symbols_fd(callstack, sizeof(callstack) / sizeof(callstack[0]), 1);
+// #else
+	
+	// void *callstack[40] = {0};
+	// char program_name[256] = {0};
+	// char cmd[256] = {0};
+	// char file_path[256] = {0};
+	// size_t size;
+	// char **strings;
+	// size_t i;
 
-	if (strings == NULL)
-		return;
-	get_program_name(program_name);
+	// // trace file output
+	// const char *home_dir = getenv("HOME");
+	// if (home_dir != NULL)
+	// 	snprintf(file_path, sizeof(file_path), "%s/.malloc_tester/trace", home_dir);
 
-	for (i = 0; i < size; i++)
-	{
-		if (strstr(strings[i], program_name) != NULL)
-		{
-			generate_addr2line_command(strings[i], cmd, sizeof(cmd));
-			write_in_file_simple(file_path, cmd);
-		}
-	}
-	free(strings);
-#endif
+	// size = backtrace(callstack, sizeof(callstack) / sizeof(callstack[0]));
+	// strings = backtrace_symbols(callstack, size);
+
+	// if (strings == NULL)
+	// 	return;
+	// get_program_name(program_name);
+
+	// for (i = 0; i < size; i++)
+	// {
+	// 	if (strstr(strings[i], program_name) != NULL)
+	// 	{
+	// 		generate_addr2line_command(strings[i], cmd, sizeof(cmd));
+	// 		write_in_file_simple(file_path, cmd);
+	// 	}
+	// }
+	// free(strings);
+// #endif
 }

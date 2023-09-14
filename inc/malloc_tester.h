@@ -6,7 +6,7 @@
 /*   By: imurugar <imurugar@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/08 10:12:50 by imurugar          #+#    #+#             */
-/*   Updated: 2023/09/13 13:51:19 by imurugar         ###   ########.fr       */
+/*   Updated: 2023/09/14 18:57:13 by imurugar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,8 @@
 #include <stdint.h>
 #include <sys/wait.h>
 #include <sys/stat.h>
+#include <err.h>
+#include <execinfo.h>
 #if defined(__APPLE__)
 #include <malloc/malloc.h>
 #define malloc_usable_size malloc_size
@@ -36,7 +38,7 @@
 void get_function_names(char *input);
 void get_trace();
 void program_finish();
-void get_program_name(char *program_name);
+void get_program_name(char *program_name, size_t size);
 
 /*FILE FUNCTIONS*/
 int write_in_file(const char *file, const char *str);
