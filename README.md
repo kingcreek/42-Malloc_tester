@@ -14,7 +14,7 @@ I hope it helps!!
 bash -c "$(curl -fsSL https://github.com/kingcreek/42-Malloc_tester/raw/main/install.sh)"
 ```
 
-The .malloc_tester folder will be under your `$HOME` directory (`/Users/<your_username>/`)
+The `.malloc_tester` folder will be under your `$HOME` directory (`/Users/<your_username>/`)
 
 # UNINSTALL
 ```
