@@ -11,6 +11,7 @@ fi
 
 sed -i'.bak' '/^alias malloc_tester=/d' $RC_FILE
 sed -i'.bak' '/^alias king=/d' $RC_FILE
+sed -i'.bak' '/^alias amparette=/d' $RC_FILE
 
 
 rm -rf "$HOME/.malloc_tester"
