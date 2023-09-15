@@ -1,4 +1,4 @@
-FROM debian:buster
+FROM ubuntu:focal
 
 RUN apt-get update && apt-get install -y curl bash libreadline-dev file binutils
 
