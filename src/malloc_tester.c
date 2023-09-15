@@ -6,7 +6,7 @@
 /*   By: imurugar <imurugar@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/08 10:12:07 by imurugar          #+#    #+#             */
-/*   Updated: 2023/09/14 19:51:23 by imurugar         ###   ########.fr       */
+/*   Updated: 2023/09/15 20:43:06 by imurugar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,9 @@ int ignore_malloc = 1;
 size_t allocated_bytes;
 size_t freed_bytes;
 int malloc_counter;
+int end_program = 1;
 char program_name[512] = {0};
+int totalMallocs = 0;
 
 static void lock_mutex_malloc() { ignore_malloc = 1; }
 static void unlock_mutex_malloc() { ignore_malloc = 0; }
@@ -34,7 +36,7 @@ void segfault_handler(int sig)
 	
 		write(1, "segmentation fault\n", 19);
 		lock_mutex_malloc();
-		if (malloc_counter != 0)
+		if (end_program != 1)
 			get_trace();
 		exit(139);
 	
@@ -44,7 +46,7 @@ void close_handler(int signo)
 {
 	// fprintf(stdout, "Finished tester\n");
 
-	if (malloc_counter == 0)
+	if (end_program == 1)
 		fprintf(stdout, "Finished tester\n");
 		/*
 		fprintf(stdout, "Finished tester\n\
@@ -61,7 +63,7 @@ void program_finish()
 	// if (malloc_counter == 0)
 	//	fprintf(stdout, "Finished tester\n");
 
-	if (malloc_counter == 0)
+	if (end_program == 1)
 		fprintf(stdout, "Finished tester\n");
 		/*
 		fprintf(stdout, "Finished tester\n\
@@ -125,7 +127,10 @@ __attribute__((constructor)) static void init()
 	const char *home_dir = getenv("HOME");
 	if (home_dir != NULL)
 		snprintf(file_path, sizeof(file_path), "%s/.malloc_tester/address.0x00", home_dir);
-
+	
+	totalMallocs = 0;
+	if (home_dir != NULL)
+		totalMallocs = read_int_from_file(file_path);
 	ignore_malloc = 0;
 	allocated_bytes = 0;
 	freed_bytes = 0;
@@ -140,7 +145,7 @@ INTERPOSE_C_VOID(exit, (int status), (status))
 	// if (malloc_counter == 0)
 	//	fprintf(stdout, "Finished tester\n");
 
-	if (malloc_counter == 0)
+	if (end_program == 1)
 		fprintf(stdout, "Finished tester\n");
 		/*
 		fprintf(stdout, "Finished tester\n\
@@ -197,13 +202,28 @@ INTERPOSE_C(void *, malloc, (size_t sz), (sz))
 				char address_str[20];
 				if (sscanf(strings[1], "%*[^+]+%[^)]", address_str) == 1)
 				{
-					if (write_in_file(file_path, address_str))
+					if(malloc_counter >= totalMallocs)
 					{
 						malloc_counter++;
+						end_program = 0;
 						free(strings);
+						totalMallocs++;
+						char n[20];
+						snprintf(n, sizeof(n), "%d", totalMallocs);
+						write_in_file_replace(file_path, n);
 						unlock_mutex_malloc();
+						errno = ENOMEM;
 						return NULL;
 					}
+					malloc_counter++;
+					// if (write_in_file(file_path, address_str))
+					// {
+					// 	malloc_counter++;
+					// 	free(strings);
+					// 	unlock_mutex_malloc();
+					// 	errno = ENOMEM;
+					// 	return NULL;
+					// }
 				}
 				void *result = Real__malloc(sz);
 				allocated_bytes += malloc_usable_size(result);
@@ -214,7 +234,8 @@ INTERPOSE_C(void *, malloc, (size_t sz), (sz))
 
 			unlock_mutex_malloc();
 			free(strings);
-			return NULL;
+			return Real__malloc(sz);
+			//return NULL;
 		}
 		unlock_mutex_malloc();
 	}

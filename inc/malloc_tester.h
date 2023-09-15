@@ -6,7 +6,7 @@
 /*   By: imurugar <imurugar@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/08 10:12:50 by imurugar          #+#    #+#             */
-/*   Updated: 2023/09/14 18:57:13 by imurugar         ###   ########.fr       */
+/*   Updated: 2023/09/15 20:43:21 by imurugar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@
 #include <sys/wait.h>
 #include <sys/stat.h>
 #include <err.h>
+#include "sys/errno.h"
 #include <execinfo.h>
 #if defined(__APPLE__)
 #include <malloc/malloc.h>
@@ -44,6 +45,8 @@ void get_program_name(char *program_name, size_t size);
 int write_in_file(const char *file, const char *str);
 int find_in_file(const char *file, const char *str);
 int write_in_file_simple(const char *file, const char *str);
+int read_int_from_file(const char *path);
+int write_in_file_replace(const char *file, const char *str);
 
 
 #endif
