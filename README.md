@@ -11,7 +11,6 @@ I hope it helps!!
 
 # INSTALL
 ```
-curl -L https://raw.githubusercontent.com/kingcreek/42-Malloc_tester/main/Dockerfile | docker build -t malloc_t:latest -f - .
 bash -c "$(curl -fsSL https://github.com/kingcreek/42-Malloc_tester/raw/main/install.sh)"
 ```
 
