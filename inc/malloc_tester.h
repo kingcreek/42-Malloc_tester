@@ -34,6 +34,7 @@
 #endif
 
 #define PROGRAM_NAME_BUFFER_SIZE 512
+#define MAX_SIZE 5000
 
 /*FILE FUNCTIONS*/
 void get_function_names(char *input);
@@ -47,6 +48,22 @@ int find_in_file(const char *file, const char *str);
 int write_in_file_simple(const char *file, const char *str);
 int read_int_from_file(const char *path);
 int write_in_file_replace(const char *file, const char *str);
+void incrementOrInsertInFile(const char* filename, const char* targetKey);
 
+/*HasMap*/
+struct KeyValue {
+    char key[20];
+    int value;
+};
+
+struct HashMap {
+    struct KeyValue data[MAX_SIZE];
+    int size;
+};
+
+void initialize(struct HashMap *hashmap);
+int get(struct HashMap* hashmap, const char* key);
+void put(struct HashMap* hashmap, const char* key, int value);
+void incrementOrInsert(struct HashMap* hashmap, const char* key);
 
 #endif

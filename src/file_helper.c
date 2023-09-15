@@ -106,3 +106,36 @@ int read_int_from_file(const char *path) {
     return ret;
 }
 
+void incrementOrInsertInFile(const char* filename, const char* targetKey) {
+    FILE* file = fopen(filename, "r+"); // Abrir el archivo en modo lectura y escritura
+
+    if (file == NULL) {
+        perror("Error al abrir el archivo");
+        exit(EXIT_FAILURE);
+    }
+
+    char line[100];
+    char key[50];
+    int value;
+    int found = 0;
+
+    while (fgets(line, sizeof(line), file)) {
+        if (sscanf(line, "%s %d", key, &value) == 2) {
+            if (strcmp(key, targetKey) == 0) {
+                value++;
+                fseek(file, -strlen(line), SEEK_CUR);
+                fprintf(file, "%s %d\n", key, value);
+                found = 1;
+                break;
+            }
+        }
+    }
+
+    if (!found) {
+        // La clave no existe, agregar una nueva línea
+        fprintf(file, "%s 1\n", targetKey);
+    }
+
+    fclose(file);
+}
+
