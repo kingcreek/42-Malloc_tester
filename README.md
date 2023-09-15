@@ -31,7 +31,7 @@ You can build the Docker image using the Dockerfile from this repository. Follow
 2. Open a terminal and run the following command to build the Docker image:
 
 ```
-docker build -t malloc_t:latest -f https://raw.github.com/kingcreek/42-Malloc_tester/main/Dockerfile .
+curl -L https://raw.githubusercontent.com/kingcreek/42-Malloc_tester/main/Dockerfile | docker build -t malloc_t -f - .
 ```
 Run:
 ```
