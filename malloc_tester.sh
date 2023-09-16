@@ -20,7 +20,7 @@ FOLDER=".malloc_tester"
 ##############################################################################################
 
 ##############################################################################################
-CURRENTVERSION="0.3"
+CURRENTVERSION="0.4"
 
 github_url="https://github.com/kingcreek/42-Malloc_tester/raw/main/version.txt"
 if ! curl -s -L "$github_url" | grep -q $CURRENTVERSION; then
@@ -140,7 +140,7 @@ if [ ! -f "$EJECUTABLE" ]; then
   echo "The executable does not exist in the specified location."
   exit 1
 fi
-file_type=$(file -b "$EXECUTABLE_PATH")
+file_type=$(file -b "$EXECUTABLE_PATH" | awk '{print $1}')
 if [[ $file_type != *executable* ]]; then
 	echo "Invalid file."
 	exit 1

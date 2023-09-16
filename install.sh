@@ -24,11 +24,11 @@ chmod +x "$HOME/$FOLDER/malloc_tester.sh"
 
 RC_FILE="$HOME/.zshrc"
 
-if [ "$(uname)" != "Darwin" ]; then
+if [ "$SO" != "linux" ]; then
 	RC_FILE="$HOME/.bashrc"
-	if [[ -f "$HOME/.zshrc" ]]; then
-		RC_FILE="$HOME/.zshrc"
-	fi
+	# if [[ -f "$HOME/.zshrc" ]]; then
+	# 	RC_FILE="$HOME/.zshrc"
+	# fi
 fi
 
 if ! grep "malloc_tester=" "$RC_FILE" &> /dev/null; then
