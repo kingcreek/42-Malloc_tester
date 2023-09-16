@@ -6,7 +6,7 @@
 /*   By: imurugar <imurugar@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/08 10:12:07 by imurugar          #+#    #+#             */
-/*   Updated: 2023/09/16 15:21:43 by imurugar         ###   ########.fr       */
+/*   Updated: 2023/09/16 15:32:52 by imurugar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ void program_finish()
 	lock_mutex_malloc();
 	if (end_program == 1)
 		fprintf(stdout, "Finished tester atexit\n");
-	exit(0);
+	exit(-198156);
 	unlock_mutex_malloc();
 }
 
@@ -81,11 +81,10 @@ __attribute__((constructor)) static void init()
 INTERPOSE_C_VOID(exit, (int status), (status))
 {
 	lock_mutex_malloc();
-	if (end_program == 1)
+	if (end_program == 1 && status != -198156)
 		fprintf(stdout, "Finished tester exit\n");
 	unlock_mutex_malloc();
 	Real__exit(status);
-	exit(0);
 }
 
 INTERPOSE_C(void *, malloc, (size_t sz), (sz))
