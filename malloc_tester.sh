@@ -141,6 +141,7 @@ if [ ! -f "$EJECUTABLE" ]; then
   exit 1
 fi
 file_type=$(file -b "$EJECUTABLE")
+echo $EJECUTABLE
 if [[ $file_type != *executable* ]]; then
 	echo "Invalid file."
 	exit 1
