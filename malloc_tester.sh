@@ -140,7 +140,7 @@ if [ ! -f "$EJECUTABLE" ]; then
   echo "The executable does not exist in the specified location."
   exit 1
 fi
-file_type=$(file -b "$EXECUTABLE_PATH" | awk '{print $1}')
+file_type=$(file -b "$EJECUTABLE")
 if [[ $file_type != *executable* ]]; then
 	echo "Invalid file."
 	exit 1
