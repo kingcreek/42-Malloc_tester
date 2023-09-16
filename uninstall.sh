@@ -2,11 +2,11 @@
 
 RC_FILE="$HOME/.zshrc"
 
-if [ "$(uname)" != "Darwin" ]; then
+if [ "$SO" == "linux" ]; then
 	RC_FILE="$HOME/.bashrc"
-	if [[ -f "$HOME/.zshrc" ]]; then
-		RC_FILE="$HOME/.zshrc"
-	fi
+	# if [[ -f "$HOME/.zshrc" ]]; then
+	# 	RC_FILE="$HOME/.zshrc"
+	# fi
 fi
 
 sed -i'.bak' '/^alias malloc_tester=/d' $RC_FILE

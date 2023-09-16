@@ -24,7 +24,7 @@ chmod +x "$HOME/$FOLDER/malloc_tester.sh"
 
 RC_FILE="$HOME/.zshrc"
 
-if [ "$SO" != "linux" ]; then
+if [ "$SO" == "linux" ]; then
 	RC_FILE="$HOME/.bashrc"
 	# if [[ -f "$HOME/.zshrc" ]]; then
 	# 	RC_FILE="$HOME/.zshrc"
