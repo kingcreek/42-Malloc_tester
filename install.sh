@@ -24,7 +24,7 @@ chmod +x "$HOME/$FOLDER/malloc_tester.sh"
 
 RC_FILE="$HOME/.zshrc"
 
-if [ "$(uname)" != "Darwin" ]; then
+if [ "$OSTYPE" != "Darwin" ]; then
 	RC_FILE="$HOME/.bashrc"
 	if [[ -f "$HOME/.zshrc" ]]; then
 		RC_FILE="$HOME/.zshrc"
