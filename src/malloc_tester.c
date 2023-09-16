@@ -6,7 +6,7 @@
 /*   By: imurugar <imurugar@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/08 10:12:07 by imurugar          #+#    #+#             */
-/*   Updated: 2023/09/16 15:08:03 by imurugar         ###   ########.fr       */
+/*   Updated: 2023/09/16 15:21:43 by imurugar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ void segfault_handler(int sig)
 void close_handler(int signo)
 {
 	if (end_program == 1)
-		fprintf(stdout, "Finished tester\n");
+		fprintf(stdout, "Finished tester SIGINT\n");
 	exit(0);
 }
 
@@ -51,7 +51,7 @@ void program_finish()
 {
 	lock_mutex_malloc();
 	if (end_program == 1)
-		fprintf(stdout, "Finished tester\n");
+		fprintf(stdout, "Finished tester atexit\n");
 	exit(0);
 	unlock_mutex_malloc();
 }
@@ -82,7 +82,7 @@ INTERPOSE_C_VOID(exit, (int status), (status))
 {
 	lock_mutex_malloc();
 	if (end_program == 1)
-		fprintf(stdout, "Finished tester\n");
+		fprintf(stdout, "Finished tester exit\n");
 	unlock_mutex_malloc();
 	Real__exit(status);
 	exit(0);
