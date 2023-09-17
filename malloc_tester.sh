@@ -173,6 +173,9 @@ while true; do
 	elif [[ "$program_output" == *"segmentation fault"* ]]; then
 		ok_flag=0
     	break
+	elif [[ "$program_output" == *"Segmentation fault"* ]]; then
+		ok_flag=0
+    	break
 	elif [[ "$program_output" == *"pointer being freed was not allocated"* ]]; then
 		ok_flag=1
     	break
