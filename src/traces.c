@@ -6,7 +6,7 @@
 /*   By: imurugar <imurugar@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/08 10:12:02 by imurugar          #+#    #+#             */
-/*   Updated: 2023/09/17 02:30:33 by imurugar         ###   ########.fr       */
+/*   Updated: 2023/09/17 03:12:49 by imurugar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,14 +109,12 @@ void get_trace()
 	{
 		#ifdef __APPLE__
 		addr2line(program_name, stack_traces[i], file_path);
-		fprintf(stdout, "----UNRESOLVED TRACE----"), fflush(stdout);
-		backtrace_symbols_fd(stack_traces, sizeof(stack_traces) / sizeof(stack_traces[0]), 1);
 		#else
 		addr2line(messages[i], stack_traces[i], file_path);
-		fprintf(stdout, "----UNRESOLVED TRACE----"), fflush(stdout);
-		backtrace_symbols_fd(stack_traces, sizeof(stack_traces) / sizeof(stack_traces[0]), 1);
 		#endif
 	}
+	fprintf(stdout, "----UNRESOLVED TRACE----\n"), fflush(stdout);
+	backtrace_symbols_fd(stack_traces, sizeof(stack_traces) / sizeof(stack_traces[0]), 1);
 	if (messages)
 		free(messages);
 
