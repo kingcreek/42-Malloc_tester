@@ -6,7 +6,7 @@
 /*   By: imurugar <imurugar@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/08 10:12:50 by imurugar          #+#    #+#             */
-/*   Updated: 2023/09/15 20:43:21 by imurugar         ###   ########.fr       */
+/*   Updated: 2023/09/17 02:39:26 by imurugar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@
 #include <err.h>
 #include "sys/errno.h"
 #include <execinfo.h>
+#include <pthread.h>
 #if defined(__APPLE__)
 #include <malloc/malloc.h>
 #define malloc_usable_size malloc_size
@@ -35,13 +36,14 @@
 
 #define PROGRAM_NAME_BUFFER_SIZE 512
 
-/*FILE FUNCTIONS*/
+/*Functions that do things*/
 void get_function_names(char *input);
 void get_trace();
 void program_finish();
 void get_program_name(char *program_name, size_t size);
+void get_main_code_range_linux(uintptr_t* start, uintptr_t* end);
 
-/*FILE FUNCTIONS*/
+/*As you can see, file functions... Between you and me, i don't use half, but maybe tomorrow i will, right?*/
 int write_in_file(const char *file, const char *str);
 int find_in_file(const char *file, const char *str);
 int write_in_file_simple(const char *file, const char *str);

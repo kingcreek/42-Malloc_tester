@@ -6,7 +6,7 @@
 /*   By: imurugar <imurugar@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/08 10:12:07 by imurugar          #+#    #+#             */
-/*   Updated: 2023/09/16 15:32:52 by imurugar         ###   ########.fr       */
+/*   Updated: 2023/09/17 02:40:54 by imurugar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,46 +28,48 @@ int end_program = 1;
 char program_name[512] = {0};
 int totalMallocs = 0;
 
-static void lock_mutex_malloc() { ignore_malloc = 1; }
-static void unlock_mutex_malloc() { ignore_malloc = 0; }
+pthread_mutex_t malloc_mutex;
+static void lock_mutex_malloc() { ignore_malloc = 1; } //Personality disorder
+static void unlock_mutex_malloc() { ignore_malloc = 0; } //His brother
 
-void segfault_handler(int sig)
+void segfault_handler(int sig) // I catch you!
 {
-		write(1, "segmentation fault\n", 19);
-		lock_mutex_malloc();
-		if (end_program != 1)
-			get_trace();
-		exit(139);
+	write(1, "segmentation fault\n", 19);
+	lock_mutex_malloc();
+	if (end_program != 1)
+		get_trace();
+	exit(139);
 }
 
+/*
 void close_handler(int signo)
 {
+	fprintf(stdout, " tester SIGINT\n");
 	if (end_program == 1)
 		fprintf(stdout, "Finished tester SIGINT\n");
-	exit(0);
 }
+*/
 
 void program_finish()
 {
+	//fprintf(stdout, " tester atexit\n");
 	lock_mutex_malloc();
 	if (end_program == 1)
 		fprintf(stdout, "Finished tester atexit\n");
-	exit(-198156);
 	unlock_mutex_malloc();
 }
 
 __attribute__((constructor)) static void init()
 {
 	lock_mutex_malloc();
-	fprintf(stdout, "init tester\n");
+	pthread_mutex_init(&malloc_mutex, NULL);
 	signal(SIGSEGV, segfault_handler);
-	signal(SIGINT, close_handler);
+	// signal(SIGINT, close_handler);
 	atexit(program_finish);
 	const char *home_dir = getenv("HOME");
 	if (home_dir != NULL)
 		snprintf(file_path, sizeof(file_path), "%s/.malloc_tester/address.0x00", home_dir);
-	
-	totalMallocs = 0;
+
 	if (home_dir != NULL)
 		totalMallocs = read_int_from_file(file_path);
 	ignore_malloc = 0;
@@ -78,20 +80,24 @@ __attribute__((constructor)) static void init()
 	unlock_mutex_malloc();
 }
 
-INTERPOSE_C_VOID(exit, (int status), (status))
+/*
+INTERPOSE_C_VOID(exit, (int status), (status)) //
 {
+	fprintf(stdout, " tester exit\n");
 	lock_mutex_malloc();
-	if (end_program == 1 && status != -198156)
+	if (end_program == 1)
 		fprintf(stdout, "Finished tester exit\n");
 	unlock_mutex_malloc();
 	Real__exit(status);
 }
+*/
 
-INTERPOSE_C(void *, malloc, (size_t sz), (sz))
+INTERPOSE_C(void *, malloc, (size_t sz), (sz)) //Magic
 {
 	if (ignore_malloc == 0)
 	{
 		lock_mutex_malloc();
+
 		void *caller = NULL;
 		int size = backtrace(callstack, sizeof(callstack) / sizeof(callstack[0]));
 		char **strings = backtrace_symbols(callstack, size);
@@ -105,46 +111,54 @@ INTERPOSE_C(void *, malloc, (size_t sz), (sz))
 
 		if (caller < (void *)0x7f0000000000)
 		{
+			pthread_mutex_lock(&malloc_mutex);
 			if (strstr(strings[1], program_name) != NULL)
 			{
-				char address_str[20];
-				if (sscanf(strings[1], "%*[^+]+%[^)]", address_str) == 1)
+				// char address_str[40];
+				// if (sscanf(strings[1], "%*[^+]+%[^)]", address_str) == 1)
+				//{
+				if (malloc_counter >= totalMallocs) // this malloc are not tested yet, let's break
 				{
-					if(malloc_counter >= totalMallocs)
-					{
-						malloc_counter++;
-						end_program = 0;
-						free(strings);
-						totalMallocs++;
-						char n[20];
-						snprintf(n, sizeof(n), "%d", totalMallocs);
-						write_in_file_replace(file_path, n);
-						unlock_mutex_malloc();
-						errno = ENOMEM;
-						return NULL;
-					}
+					// simple counters
+					end_program = 0;
 					malloc_counter++;
+					totalMallocs++;
+					// write in file to next iterations
+					char n[100];
+					snprintf(n, sizeof(n), "%d", totalMallocs);
+					write_in_file_replace(file_path, n);
+					// set errno
+					errno = ENOMEM;
+					// free & unlock
+					free(strings);
+					pthread_mutex_unlock(&malloc_mutex);
+					unlock_mutex_malloc();
+					return NULL;
 				}
+				// malloc tested, only count
+				malloc_counter++;
+				//}
+				// malloc already tested, only retunr real malloc
 				void *result = Real__malloc(sz);
-				allocated_bytes += malloc_usable_size(result);
+				// allocated_bytes += malloc_usable_size(result);
 				free(strings);
+				pthread_mutex_unlock(&malloc_mutex);
 				unlock_mutex_malloc();
 				return result;
 			}
-
+			//This call does not come from the program, run!
+			pthread_mutex_unlock(&malloc_mutex);
 			unlock_mutex_malloc();
 			free(strings);
 			return Real__malloc(sz);
-			//return NULL;
 		}
 		unlock_mutex_malloc();
 	}
-	void *result = Real__malloc(sz);
-	// allocated_bytes += malloc_usable_size(result);
-	return result;
+	//I have no fucking idea where this call is coming from, but I really don't care. System defeated!
+	return Real__malloc(sz);
 }
 
-INTERPOSE_C_VOID(free, (void *p), (p))
+INTERPOSE_C_VOID(free, (void *p), (p)) //Maybe one day i will remember you and implement you, but for now ours cannot be
 {
 	/*
 	if (ignore_malloc == 0)

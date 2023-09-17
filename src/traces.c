@@ -6,7 +6,7 @@
 /*   By: imurugar <imurugar@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/08 10:12:02 by imurugar          #+#    #+#             */
-/*   Updated: 2023/09/14 19:52:02 by imurugar         ###   ########.fr       */
+/*   Updated: 2023/09/17 02:30:33 by imurugar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,6 @@ void get_program_name(char *program_name, size_t size)
 		snprintf(program_name, size, "%s", progname);
 		return;
 	}
-
 	if (size > 0 && program_name != NULL)
 	{
 		const char *argv0 = NULL;
@@ -43,9 +42,7 @@ void get_program_name(char *program_name, size_t size)
 			}
 		}
 		if (argv0 == NULL)
-		{
-			argv0 = "unknown"; // Valor predeterminado si no se encuentra
-		}
+			argv0 = "unknown";
 		snprintf(program_name, size, "%s", argv0);
 	}
 #else
@@ -56,25 +53,15 @@ void get_program_name(char *program_name, size_t size)
 	int fd = -1;
 
 	snprintf(proc_path, sizeof(proc_path), "/proc/%d/cmdline", my_pid);
-
 	fd = open(proc_path, O_RDONLY);
 	if (fd == -1)
-	{
 		return;
-	}
-
 	size_t offset = 0;
 	while ((len = read(fd, program_name + offset, PROGRAM_NAME_BUFFER_SIZE - offset - 1)) > 0 && offset < PROGRAM_NAME_BUFFER_SIZE)
-	{
 		offset += len;
-	}
-
 	close(fd);
-
 	if (offset > 0)
-	{
 		program_name[offset] = '\0';
-	}
 #endif
 }
 
@@ -122,8 +109,12 @@ void get_trace()
 	{
 		#ifdef __APPLE__
 		addr2line(program_name, stack_traces[i], file_path);
+		fprintf(stdout, "----UNRESOLVED TRACE----"), fflush(stdout);
+		backtrace_symbols_fd(stack_traces, sizeof(stack_traces) / sizeof(stack_traces[0]), 1);
 		#else
 		addr2line(messages[i], stack_traces[i], file_path);
+		fprintf(stdout, "----UNRESOLVED TRACE----"), fflush(stdout);
+		backtrace_symbols_fd(stack_traces, sizeof(stack_traces) / sizeof(stack_traces[0]), 1);
 		#endif
 	}
 	if (messages)

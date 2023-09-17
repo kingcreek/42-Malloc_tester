@@ -6,7 +6,7 @@
 /*   By: imurugar <imurugar@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/08 13:31:58 by imurugar          #+#    #+#             */
-/*   Updated: 2023/09/15 20:43:02 by imurugar         ###   ########.fr       */
+/*   Updated: 2023/09/17 01:01:11 by imurugar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,36 +73,27 @@ int write_in_file_simple(const char *file, const char *str)
 
 int write_in_file_replace(const char *file, const char *str)
 {
-    int fd = open(file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-    if (fd == -1)
-    {
-        return -1;
-    }
+	int fd = open(file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	if (fd == -1)
+	{
+		return -1;
+	}
 
-    write(fd, str, strlen(str));
-    close(fd);
-    return 1;
+	write(fd, str, strlen(str));
+	close(fd);
+	return 1;
 }
 
-int read_int_from_file(const char *path) {
-    int fd;            
-    char buffer[1024]; 
-    ssize_t bytes;
-    int ret;
+int read_int_from_file(const char *path)
+{
+	FILE *file = fopen(path, "r");
+	int i = 0;
 
-    fd = open(path, O_RDONLY);
-    if (fd == -1) {
-        perror("Error al abrir el archivo");
-    }
-    bytes = read(fd, buffer, sizeof(buffer));
-    if (bytes == -1) {
-        perror("Error al leer el archivo");
-        close(fd);
-        return -1; 
-    }
-    ret = atoi(buffer);
-    close(fd);
-
-    return ret;
+	fscanf(file, "%d", &i);
+	while (!feof(file))
+	{
+		fscanf(file, "%d", &i);
+	}
+	fclose(file);
+	return i;
 }
-

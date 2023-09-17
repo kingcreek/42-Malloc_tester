@@ -20,7 +20,7 @@ FOLDER=".malloc_tester"
 ##############################################################################################
 
 ##############################################################################################
-CURRENTVERSION="0.7"
+CURRENTVERSION="0.8"
 
 github_url="https://github.com/kingcreek/42-Malloc_tester/raw/main/version.txt"
 if ! curl -s -L "$github_url" | grep -q $CURRENTVERSION; then
@@ -35,13 +35,14 @@ fi
 ADDRESSFILE=$HOME/$FOLDER/address.0x00
 TRACE_FILE="$HOME/$FOLDER/trace"
 
+echo $HOME
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-	# LOCAL_LIBRARY_NAME="./malloc_tester.so"
-	LOCAL_LIBRARY_NAME="$HOME/$FOLDER/malloc_tester.so"
+	LOCAL_LIBRARY_NAME="./malloc_tester.so"
+	# LOCAL_LIBRARY_NAME="$HOME/$FOLDER/malloc_tester.so"
 	LOAD_FUNCTION="LD_PRELOAD"
 elif [[ "$OSTYPE" == "darwin"* ]]; then
-	# LOCAL_LIBRARY_NAME="./malloc_tester.dylib"
-	LOCAL_LIBRARY_NAME="$HOME/$FOLDER/malloc_tester.dylib"
+	LOCAL_LIBRARY_NAME="./malloc_tester.dylib"
+	# LOCAL_LIBRARY_NAME="$HOME/$FOLDER/malloc_tester.dylib"
 	LOAD_FUNCTION="DYLD_INSERT_LIBRARIES"
 else
   echo "Unsupported operating system."
@@ -99,6 +100,9 @@ fi
 echo -e "\nMake sure that the program is compiled with the "-g" flag as well as the libraries that you use (ft_printf, libft..) for a correct operation of the tester"
 read -e -p "Enter the path of the executable: " EXECUTABLE_PATH
 
+
+eval "echo $LOAD_FUNCTION=$LOCAL_LIBRARY_NAME $EXECUTABLE_PATH"
+echo $LOAD_FUNCTION=$LOCAL_LIBRARY_NAME $EXECUTABLE_PATH
 ##############################################################################################
 #EXECUTABLE_PATH=""
 
@@ -156,15 +160,11 @@ ok_flag=99
 
 while true; do
 
-	# if [[ "$OSTYPE" == "linux-gnu"* ]]; then
 	rm -f $TRACE_FILE
 	touch $TRACE_FILE
 	# fi
 	#program_output=$(eval "$LOAD_FUNCTION=./$LOCAL_LIBRARY_NAME $EXECUTABLE_PATH" 2>&1 | tee /dev/tty)
 	program_output=$(eval "$LOAD_FUNCTION=$LOCAL_LIBRARY_NAME $EXECUTABLE_PATH" | tee /dev/tty)
-  	#eval "$LOAD_FUNCTION=./$LOCAL_LIBRARY_NAME $EXECUTABLE_PATH" < /dev/tty &
-  	#pid=$!
-  	#wait $pid
   	program_result=$?
   
   	if [ $program_result -eq 139 ]; then
