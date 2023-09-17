@@ -35,7 +35,6 @@ fi
 ADDRESSFILE=$HOME/$FOLDER/address.0x00
 TRACE_FILE="$HOME/$FOLDER/trace"
 
-echo $HOME
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
 	# LOCAL_LIBRARY_NAME="./malloc_tester.so"
 	LOCAL_LIBRARY_NAME="$HOME/$FOLDER/malloc_tester.so"
@@ -100,9 +99,6 @@ fi
 echo -e "\nMake sure that the program is compiled with the "-g" flag as well as the libraries that you use (ft_printf, libft..) for a correct operation of the tester"
 read -e -p "Enter the path of the executable: " EXECUTABLE_PATH
 
-
-eval "echo $LOAD_FUNCTION=$LOCAL_LIBRARY_NAME $EXECUTABLE_PATH"
-echo $LOAD_FUNCTION=$LOCAL_LIBRARY_NAME $EXECUTABLE_PATH
 ##############################################################################################
 #EXECUTABLE_PATH=""
 
