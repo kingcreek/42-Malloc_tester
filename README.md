@@ -38,6 +38,7 @@ docker run -it --rm -v /path/to/your/program:/program_name malloc_t
 ```
 
 To make everything a little easier, from the docker command you can copy the project to the machine that runs Docker.
+
 `/path/to/your/program` refers to your local project.
 
 `/program_name` refers to the project path within the machine in Docker.
