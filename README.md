@@ -41,7 +41,7 @@ To make everything a little easier, from the docker command you can copy the pro
 
 `/path/to/your/program` refers to your local project.
 
-`/program_name` refers to the project path within the machine in Docker.
+`/program_name` refers to the destination path of the project within the Docker machine.
 
 # USAGE
 -Make sure that your program and its libraries, if you use any (ft_printf, libft...) have been compiled with the `-g` flag
