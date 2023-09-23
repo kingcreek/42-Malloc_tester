@@ -37,10 +37,14 @@ Run:
 docker run -it --rm -v /path/to/your/program:/program_name malloc_t
 ```
 
+To make everything a little easier, from the docker command you can copy the project to the machine that runs Docker.
+`/path/to/your/program` refers to your local project
+`/program_name` refers to the project path within the machine in Docker
+
 # USAGE
 -Make sure that your program and its libraries, if you use any (ft_printf, libft...) have been compiled with the `-g` flag
 
--Run `malloc_tester` in the terminal to start the program, type the name of your executable when prompted ex: `./a.out <optional args>`, you can add arguments if necessary
+-Run `malloc_tester` in the terminal to start the program, type the name of your executable when prompted, you can add arguments if necessary: `./a.out <optional args>`
 
 # Compilation
 
@@ -48,11 +52,11 @@ Compile in Linux:
 `make`
 
 Load shared lib:
-`LD_PRELOAD=./malloc_tester.so ./Your_Program`
+`LD_PRELOAD=./malloc_tester.so ./Your_Program <optional args>`
 
 Compile in MacOs:
 `make`
 
 Load shared DyLib:
-`DYLD_INSERT_LIBRARIES=./malloc_tester.dylib ./Your_Program`
+`DYLD_INSERT_LIBRARIES=./malloc_tester.dylib ./Your_Program <optional args>`
 
