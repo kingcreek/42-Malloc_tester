@@ -88,7 +88,7 @@ void addr2line(const char* program_name, void const *const addr, char *file_path
 #endif
 }
 
-#define MAX_STACK_FRAMES 64
+#define MAX_STACK_FRAMES 10
 static void *stack_traces[MAX_STACK_FRAMES];
 void get_trace()
 {
