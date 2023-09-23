@@ -11,6 +11,7 @@ fi
 
 #FOLDER=".malloc_tester"
 #mkdir -p "$HOME/$FOLDER"
+rm -r "$HOME/$FOLDER"
 
 cd $HOME
 git clone https://github.com/kingcreek/42-Malloc_tester.git .malloc_tester
