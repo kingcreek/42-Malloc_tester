@@ -9,6 +9,7 @@ else
     exit 1
 fi
 
+CURRENT_PWD="$PWD"
 FOLDER=".malloc_tester"
 #mkdir -p "$HOME/$FOLDER"
 rm -rf "$HOME/$FOLDER"
@@ -49,6 +50,7 @@ if ! grep "amparette=" "$RC_FILE" &> /dev/null; then
 	printf "\nalias amparette=%s/malloc_tester.sh\n" "$HOME/$FOLDER" >> "$RC_FILE"
 fi
 
+cd "$CURRENT_PWD"
 echo "Configuration completed. You can run 'malloc_tester' to run the program."
 
 exec "$SHELL"
