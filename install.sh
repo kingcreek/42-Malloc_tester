@@ -9,16 +9,20 @@ else
     exit 1
 fi
 
-FOLDER=".malloc_tester"
+#FOLDER=".malloc_tester"
+#mkdir -p "$HOME/$FOLDER"
 
-mkdir -p "$HOME/$FOLDER"
+cd $HOME
+git clone https://github.com/kingcreek/42-Malloc_tester.git .malloc_tester
+cd .malloc_tester
+make
 
-if [ "$SO" == "linux" ]; then
-    curl -L -o "$HOME/$FOLDER/malloc_tester.so" "https://github.com/kingcreek/42-Malloc_tester/raw/main/malloc_tester.so"
-elif [ "$SO" == "macos" ]; then
-    curl -L -o "$HOME/$FOLDER/malloc_tester.dylib" "https://github.com/kingcreek/42-Malloc_tester/raw/main/malloc_tester.dylib"
-fi
-curl -L -o "$HOME/$FOLDER/malloc_tester.sh" "https://github.com/kingcreek/42-Malloc_tester/raw/main/malloc_tester.sh"
+# if [ "$SO" == "linux" ]; then
+#     curl -L -o "$HOME/$FOLDER/malloc_tester.so" "https://github.com/kingcreek/42-Malloc_tester/raw/main/malloc_tester.so"
+# elif [ "$SO" == "macos" ]; then
+#     curl -L -o "$HOME/$FOLDER/malloc_tester.dylib" "https://github.com/kingcreek/42-Malloc_tester/raw/main/malloc_tester.dylib"
+# fi
+# curl -L -o "$HOME/$FOLDER/malloc_tester.sh" "https://github.com/kingcreek/42-Malloc_tester/raw/main/malloc_tester.sh"
 
 chmod +x "$HOME/$FOLDER/malloc_tester.sh"
 
