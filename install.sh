@@ -9,7 +9,7 @@ else
     exit 1
 fi
 
-#FOLDER=".malloc_tester"
+FOLDER=".malloc_tester"
 #mkdir -p "$HOME/$FOLDER"
 rm -r "$HOME/$FOLDER"
 
