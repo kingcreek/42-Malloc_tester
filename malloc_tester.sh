@@ -142,7 +142,7 @@ if [ ! -f "$EJECUTABLE" ]; then
 fi
 file_type=$(file -b "$EJECUTABLE")
 echo $EJECUTABLE
-if [[ $file_type != *executable* ]]; then
+if [[ $file_type != *ELF* ]]; then
 	echo "Invalid file."
 	exit 1
 fi
