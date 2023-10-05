@@ -20,7 +20,7 @@ FOLDER=".malloc_tester"
 ##############################################################################################
 
 ##############################################################################################
-CURRENTVERSION="1.0"
+CURRENTVERSION="1.1"
 
 github_url="https://github.com/kingcreek/42-Malloc_tester/raw/main/version.txt"
 if ! curl -s -L "$github_url" | grep -q $CURRENTVERSION; then
@@ -142,7 +142,7 @@ if [ ! -f "$EJECUTABLE" ]; then
 fi
 file_type=$(file -b "$EJECUTABLE")
 echo $EJECUTABLE
-if [[ $file_type != *ELF* ]]; then
+if [[ $file_type != *64* ]]; then
 	echo "Invalid file."
 	exit 1
 fi
