@@ -20,7 +20,7 @@ FOLDER=".malloc_tester"
 ##############################################################################################
 
 ##############################################################################################
-CURRENTVERSION="1.4"
+CURRENTVERSION="1.5"
 
 github_url="https://github.com/kingcreek/42-Malloc_tester/raw/main/version.txt"
 if ! curl -s -L "$github_url" | grep -q $CURRENTVERSION; then
@@ -34,6 +34,7 @@ fi
 
 ADDRESSFILE=$HOME/$FOLDER/address.0x00
 TRACE_FILE="$HOME/$FOLDER/trace"
+LEAKS_FILE="$HOME/$FOLDER/leaks"
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
 	# LOCAL_LIBRARY_NAME="./malloc_tester.so"
@@ -158,9 +159,11 @@ while true; do
 
 	rm -f $TRACE_FILE
 	touch $TRACE_FILE
+	rm -f $LEAKS_FILE
+	touch $LEAKS_FILE
 	# fi
 	#program_output=$(eval "$LOAD_FUNCTION=./$LOCAL_LIBRARY_NAME $EXECUTABLE_PATH" 2>&1 | tee /dev/tty)
-	program_output=$(eval "$LOAD_FUNCTION=$LOCAL_LIBRARY_NAME $EXECUTABLE_PATH" | tee /dev/tty)
+	program_output=$(eval "$LOAD_FUNCTION=$LOCAL_LIBRARY_NAME $EXECUTABLE_PATH 2>&1" | tee /dev/tty)
   	program_result=$?
   
   	if [ $program_result -eq 139 ]; then
@@ -175,7 +178,13 @@ while true; do
 	elif [[ "$program_output" == *"pointer being freed was not allocated"* ]]; then
 		ok_flag=1
     	break
-  	elif [[ "$program_output" == *"Finished tester"* ]]; then
+	elif [[ "$program_output" == *"double free"* ]]; then
+		ok_flag=1
+    	break
+	elif [[ "$program_output" == *"===LEAKS==="* ]]; then
+		ok_flag=2
+    	break
+  	elif [[ "$program_output" == *"Test completed correctly"* ]]; then
     	break
   	fi
 done
@@ -184,6 +193,20 @@ if [ $ok_flag -eq 99 ]; then
   echo -e "\n\033[32mOK\033[0m\n"
 elif [ $ok_flag -eq 1 ]; then
   echo -e "\n\x1B[31mKO (double free)\x1B[0m"
+elif [ $ok_flag -eq 2 ]; then
+  echo -e "\n\x1B[33mKO (leaks)\x1B[0m"
+  if [ -f "$LEAKS_FILE" ]; then
+		line_number=0
+    	while IFS= read -r line; do
+			((line_number++))
+			if [ $((line_number % 2)) -eq 0 ]; then
+      			result=$(eval "$line")
+	  			echo $result
+			else
+            	echo "$line"
+        	fi
+    	done < "$LEAKS_FILE"
+	fi
 else
 	echo -e "\n\x1B[31mKO (Segfault)\x1B[0m"
 	if [ -f "$TRACE_FILE" ]; then
@@ -200,7 +223,8 @@ fi
 
 rm -f $ADDRESSFILE
 rm -f $TRACE_FILE
+rm -f $LEAKS_FILE
 
-echo -e "\nFinish."
+echo -e "\n"
 
 ##############################################################################################

@@ -6,7 +6,7 @@
 /*   By: imurugar <imurugar@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/08 10:12:07 by imurugar          #+#    #+#             */
-/*   Updated: 2023/12/09 13:44:29 by imurugar         ###   ########.fr       */
+/*   Updated: 2023/12/10 17:41:05 by imurugar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@ typedef struct
 {
 	void *ptr;
 	size_t size;
+	char *location;
 } AllocationRecord;
 
 AllocationRecord allocations[MAX_ALLOCATIONS];
@@ -49,27 +50,13 @@ void segfault_handler(int sig) // I catch you!
 	exit(139);
 }
 
-/*
-void close_handler(int signo)
-{
-	fprintf(stdout, " tester SIGINT\n");
-	if (end_program == 1)
-		fprintf(stdout, "Finished tester SIGINT\n");
-}
-*/
-
 void program_finish()
 {
-	// fprintf(stdout, " tester atexit\n");
 	lock_mutex_malloc();
 	if (end_program == 1)
 	{
-		size_t totalMem = 0;
-		for(int i = 0; i < malloc_counter; i++)
-			totalMem += allocations[i].size;
-		if (totalMem > 0)
-			fprintf(stdout, " \n ===LEAKS=== \nMemory not released by you: %lu\n", totalMem);
-		fprintf(stdout, "Finished tester atexit\n");
+		if (calculate_leaks())
+			fprintf(stdout, "Test completed correctly\n");
 	}
 	unlock_mutex_malloc();
 }
@@ -92,18 +79,6 @@ __attribute__((constructor)) static void init()
 	get_program_name(program_name, sizeof(program_name));
 	unlock_mutex_malloc();
 }
-
-/*
-INTERPOSE_C_VOID(exit, (int status), (status)) //
-{
-	fprintf(stdout, " tester exit\n");
-	lock_mutex_malloc();
-	if (end_program == 1)
-		fprintf(stdout, "Finished tester exit\n");
-	unlock_mutex_malloc();
-	Real__exit(status);
-}
-*/
 
 INTERPOSE_C(void *, malloc, (size_t sz), (sz)) // Magic
 {
@@ -149,10 +124,16 @@ INTERPOSE_C(void *, malloc, (size_t sz), (sz)) // Magic
 					unlock_mutex_malloc();
 					return NULL;
 				}
-				
+
 				void *result = Real__malloc(sz);
 				allocations[malloc_counter].ptr = result;
 				allocations[malloc_counter].size = sz;
+#ifdef __APPLE__
+				allocations[malloc_counter].location = malloc_location(program_name, callstack[i]);
+#else
+				allocations[malloc_counter].location = malloc_location(strings[1], callstack[1]);
+#endif
+
 				free(strings);
 				pthread_mutex_unlock(&malloc_mutex);
 				malloc_counter++;
@@ -189,16 +170,9 @@ INTERPOSE_C_VOID(free, (void *p), (p)) // Maybe one day i will remember you and 
 			return;
 		}
 
-		/*
-		for(int i = 0; i < size; i++)
-		{
-			fprintf(stderr, "in free: %d %s\n", i, strings[i]);
-		}
-		*/
-
 		if (strstr(strings[1], program_name) != NULL)
 		{
-			for(int i = 0; i < malloc_counter; i++)
+			for (int i = 0; i < malloc_counter; i++)
 			{
 				if (allocations[i].ptr == p)
 				{
@@ -206,18 +180,7 @@ INTERPOSE_C_VOID(free, (void *p), (p)) // Maybe one day i will remember you and 
 					break;
 				}
 			}
-			//freed_bytes += malloc_size(p);
-			//fprintf(stderr, "total freed: %lu\n", freed_bytes);
 		}
-		/*
-		caller = callstack[1];
-		if (caller < (void *)0x7f0000000000)
-		{
-			if (strstr(strings[1], program_name) != NULL)
-				freed_bytes += malloc_usable_size(p);
-			// fprintf(stderr, "freed_bytes: %zu\n", freed_bytes);
-		}
-		*/
 
 		Real__free(strings);
 		Real__free(p);
@@ -225,8 +188,51 @@ INTERPOSE_C_VOID(free, (void *p), (p)) // Maybe one day i will remember you and 
 		return;
 	}
 
-	// freed_bytes += malloc_usable_size(p);
-	// unlock_mutex_malloc();
-
 	Real__free(p);
+}
+
+int calculate_leaks()
+{
+	char file_path[256] = {0};
+	const char *home_dir = getenv("HOME");
+	if (home_dir != NULL)
+		snprintf(file_path, sizeof(file_path), "%s/.malloc_tester/leaks", home_dir);
+	size_t totalMem = 0;
+	for (int i = 0; i < malloc_counter; i++)
+	{
+		totalMem += allocations[i].size;
+		if (allocations[i].size > 0)
+		{
+			char info[256] = {0};
+			snprintf(info, sizeof(info), "leak %ld bytes in %p", allocations[i].size, allocations[i].location);
+			write_in_file_simple(file_path, info);
+			write_in_file_simple(file_path, allocations[i].location);
+		}
+		free(allocations[i].location);
+	}
+	if (totalMem > 0)
+		return (fprintf(stdout, " \n ===LEAKS=== \n Total memory not released by you: %lu bytes\n", totalMem), 0);
+	return (1);
+}
+
+char *malloc_location(const char *program_name, void const *const addr)
+{
+	char addr2line_cmd[512] = {0};
+
+/* have addr2line map the address to the relent line in the code */
+#ifdef __APPLE__
+	/* apple does things differently... */
+	sprintf(addr2line_cmd, "atos -o %.256s %p", program_name, addr);
+	// write_in_file_simple(file_path, addr2line_cmd);
+#else
+	char p_name[256];
+	unsigned long long address;
+	int result = sscanf(program_name, "%[^+(]%*c%llx", p_name, &address);
+	if (result == 2)
+	{
+		sprintf(addr2line_cmd, "addr2line -e  %s + %#llx", p_name, address);
+		// write_in_file_simple(file_path, addr2line_cmd);
+	}
+#endif
+	return strdup(addr2line_cmd);
 }
