@@ -20,7 +20,7 @@ FOLDER=".malloc_tester"
 ##############################################################################################
 
 ##############################################################################################
-CURRENTVERSION="1.5"
+CURRENTVERSION="1.6"
 
 github_url="https://github.com/kingcreek/42-Malloc_tester/raw/main/version.txt"
 if ! curl -s -L "$github_url" | grep -q $CURRENTVERSION; then
@@ -151,6 +151,10 @@ fi
 rm -f $ADDRESSFILE
 touch $ADDRESSFILE
 
+if [[ ! "$EXECUTABLE_PATH" =~ ^\./ ]]; then
+    EXECUTABLE_PATH="./$EXECUTABLE_PATH"
+fi
+
 echo "Launch $EXECUTABLE_PATH with lib injected..."
 
 ok_flag=99
@@ -163,7 +167,7 @@ while true; do
 	touch $LEAKS_FILE
 	# fi
 	#program_output=$(eval "$LOAD_FUNCTION=./$LOCAL_LIBRARY_NAME $EXECUTABLE_PATH" 2>&1 | tee /dev/tty)
-	program_output=$(eval "$LOAD_FUNCTION=$LOCAL_LIBRARY_NAME $EXECUTABLE_PATH 2>&1" | tee /dev/tty)
+	program_output=$(eval "$LOAD_FUNCTION=$LOCAL_LIBRARY_NAME $EXECUTABLE_PATH" | tee /dev/tty)
   	program_result=$?
   
   	if [ $program_result -eq 139 ]; then
