@@ -113,8 +113,8 @@ void get_trace()
 		addr2line(messages[i], stack_traces[i], file_path);
 		#endif
 	}
-	//fprintf(stdout, "----UNRESOLVED TRACE----\n"), fflush(stdout);
-	//backtrace_symbols_fd(stack_traces, sizeof(stack_traces) / sizeof(stack_traces[0]), 1);
+	fprintf(stdout, "----UNRESOLVED TRACE----\n"), fflush(stdout);
+	backtrace_symbols_fd(stack_traces, sizeof(stack_traces) / sizeof(stack_traces[0]), 1);
 	if (messages)
 		free(messages);
 
