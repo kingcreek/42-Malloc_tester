@@ -29,6 +29,7 @@
 #include <pthread.h>
 #if defined(__APPLE__)
 #include <malloc/malloc.h>
+#include <mach-o/dyld.h>
 #define malloc_usable_size malloc_size
 #elif defined(__ELF__)
 #include <malloc.h>
@@ -51,6 +52,6 @@ int read_int_from_file(const char *path);
 int write_in_file_replace(const char *file, const char *str);
 int calculate_leaks();
 char *malloc_location(const char *program_name, void const *const addr);
-
+intptr_t obtenerSlide();
 
 #endif
