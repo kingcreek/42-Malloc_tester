@@ -129,7 +129,7 @@ INTERPOSE_C(void *, malloc, (size_t sz), (sz)) // Magic
 				allocations[malloc_counter].ptr = result;
 				allocations[malloc_counter].size = sz;
 #ifdef __APPLE__
-				allocations[malloc_counter].location = malloc_location(program_name, callstack[1]);
+				allocations[malloc_counter].location = malloc_location(program_name, callstack[1] - getSlide());
 #else
 				allocations[malloc_counter].location = malloc_location(strings[1], callstack[1]);
 #endif
@@ -236,3 +236,18 @@ char *malloc_location(const char *program_name, void const *const addr)
 #endif
 	return strdup(addr2line_cmd);
 }
+
+intptr_t getSlide()
+{
+    const struct mach_header *header;
+    intptr_t slide = 0;
+
+    header = _dyld_get_image_header(0);  // 0 significa el binario principal
+
+    if (header != NULL) {
+        slide = _dyld_get_image_vmaddr_slide(0);
+        //printf("Slide: %#lx\n", (unsigned long)slide);
+    }
+	return slide;
+}
+
