@@ -74,7 +74,7 @@ void addr2line(const char* program_name, void const *const addr, char *file_path
 /* have addr2line map the address to the relent line in the code */
 #ifdef __APPLE__
 	/* apple does things differently... */
-	sprintf(addr2line_cmd, "atos -o %.256s %p", program_name, addr);
+	sprintf(addr2line_cmd, "atos -o %.256s %p", program_name, addr - getSlide());
 	write_in_file_simple(file_path, addr2line_cmd);
 #else
 	char p_name[256];
