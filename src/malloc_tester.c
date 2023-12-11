@@ -129,7 +129,7 @@ INTERPOSE_C(void *, malloc, (size_t sz), (sz)) // Magic
 				allocations[malloc_counter].ptr = result;
 				allocations[malloc_counter].size = sz;
 #ifdef __APPLE__
-				allocations[malloc_counter].location = malloc_location(program_name, callstack[i]);
+				allocations[malloc_counter].location = malloc_location(program_name, callstack[1]);
 #else
 				allocations[malloc_counter].location = malloc_location(strings[1], callstack[1]);
 #endif
