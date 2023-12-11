@@ -52,6 +52,6 @@ int read_int_from_file(const char *path);
 int write_in_file_replace(const char *file, const char *str);
 int calculate_leaks();
 char *malloc_location(const char *program_name, void const *const addr);
-intptr_t obtenerSlide();
+intptr_t getSlide();
 
 #endif
