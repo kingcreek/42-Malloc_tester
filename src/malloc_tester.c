@@ -239,6 +239,7 @@ char *malloc_location(const char *program_name, void const *const addr)
 
 intptr_t getSlide()
 {
+	#ifdef __APPLE__
     const struct mach_header *header;
     intptr_t slide = 0;
 
@@ -249,5 +250,8 @@ intptr_t getSlide()
         //printf("Slide: %#lx\n", (unsigned long)slide);
     }
 	return slide;
+	#else
+	return 0;
+	#endif
 }
 
