@@ -20,7 +20,7 @@ FOLDER=".malloc_tester"
 ##############################################################################################
 
 ##############################################################################################
-CURRENTVERSION="2.1"
+CURRENTVERSION="2.2"
 
 github_url="https://github.com/kingcreek/42-Malloc_tester/raw/main/version.txt"
 if ! curl -s -L "$github_url" | grep -q $CURRENTVERSION; then
