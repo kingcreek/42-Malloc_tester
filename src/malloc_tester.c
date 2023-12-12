@@ -41,10 +41,28 @@ pthread_mutex_t malloc_mutex;
 static void lock_mutex_malloc() { ignore_malloc = 1; }	 // Personality disorder
 static void unlock_mutex_malloc() { ignore_malloc = 0; } // His brother
 
+
+void sigsegv_handler(int signum, siginfo_t *info, void *context) {
+    ucontext_t *ucontext = (ucontext_t *)context;
+    void *fault_address = (void *)ucontext->uc_mcontext.gregs[REG_ERR]; //REG_RIP REG_EIP
+    printf("pointer seg address: %p\n", fault_address);
+
+    lock_mutex_malloc();
+	write(1, "segmentation fault\n", 19);
+	
+	if (end_program != 1)
+		get_trace();
+	exit(139);
+}
+
 void segfault_handler(int sig) // I catch you!
 {
-	write(1, "segmentation fault\n", 19);
 	lock_mutex_malloc();
+	void *fault_address;
+    asm("movq %%rax, %0" : "=r"(fault_address));
+	fprintf(stdout, "pointer seg address: %p\n", fault_address);
+	write(1, "segmentation fault\n", 19);
+	
 	if (end_program != 1)
 		get_trace();
 	exit(139);
@@ -66,7 +84,20 @@ __attribute__((constructor)) static void init()
 	lock_mutex_malloc();
 	pthread_mutex_init(&malloc_mutex, NULL);
 	signal(SIGSEGV, segfault_handler);
-	// signal(SIGINT, close_handler);
+	/*
+	struct sigaction sa;
+    sa.sa_flags = SA_SIGINFO;
+    sa.sa_sigaction = sigsegv_handler;
+    sigaction(SIGSEGV, &sa, NULL);
+	*/
+	/*
+	struct sigaction sa, old;
+	sa.sa_sigaction = sigsegv_handler;
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = SA_RESTART | SA_SIGINFO;
+
+	sigaction(SIGSEGV, &sa, NULL);
+	*/
 	atexit(program_finish);
 	const char *home_dir = getenv("HOME");
 	if (home_dir != NULL)
