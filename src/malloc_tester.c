@@ -41,7 +41,7 @@ pthread_mutex_t malloc_mutex;
 static void lock_mutex_malloc() { ignore_malloc = 1; }	 // Personality disorder
 static void unlock_mutex_malloc() { ignore_malloc = 0; } // His brother
 
-
+/*
 void sigsegv_handler(int signum, siginfo_t *info, void *context) {
     ucontext_t *ucontext = (ucontext_t *)context;
     void *fault_address = (void *)ucontext->uc_mcontext.gregs[REG_ERR]; //REG_RIP REG_EIP
@@ -53,7 +53,7 @@ void sigsegv_handler(int signum, siginfo_t *info, void *context) {
 	if (end_program != 1)
 		get_trace();
 	exit(139);
-}
+}*/
 
 void segfault_handler(int sig) // I catch you!
 {
