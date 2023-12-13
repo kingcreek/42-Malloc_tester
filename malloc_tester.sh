@@ -95,10 +95,30 @@ fi
 
 ##############################################################################################
 
+
 ##############################################################################################
+
+HISTFILE="$HOME/$FOLDER/script_history"
+touch "$HISTFILE"
+if [ -e "$HISTFILE" ]; then
+    history -r "$HISTFILE"
+fi
 
 echo -e "\nMake sure that the program is compiled with the "-g" flag as well as the libraries that you use (ft_printf, libft..) for a correct operation of the tester"
 read -e -p "Enter the path of the executable: " EXECUTABLE_PATH
+
+if [ $(history | wc -l) -ge 50 ]; then
+    history -d 1
+fi
+
+if ! history | grep -q "$EXECUTABLE_PATH"; then
+    history -s "$EXECUTABLE_PATH"
+fi
+history -w "$HISTFILE"
+
+##############################################################################################
+
+
 
 ##############################################################################################
 #EXECUTABLE_PATH=""
@@ -128,12 +148,23 @@ read -e -p "Enter the path of the executable: " EXECUTABLE_PATH
 #fi
 ##############################################################################################
 
+##############################################################################################
+
 if [[ "$EXECUTABLE_PATH" == "leaks "* ]]; then
   PROGRAM_NAME=$(echo "$EXECUTABLE_PATH" | cut -d' ' -f2)
   while true; do
     leaks -q "$PROGRAM_NAME"
   done
+  exit 1
 fi
+
+if [[ "$EXECUTABLE_PATH" == "functions "* ]]; then
+  PROGRAM_NAME=$(echo "$EXECUTABLE_PATH" | cut -d' ' -f2)
+  nm -n "$PROGRAM_NAME"
+  exit 1
+fi
+
+##############################################################################################
 
 EJECUTABLE=$(echo "$EXECUTABLE_PATH" | awk '{print $1}')
 
@@ -204,8 +235,10 @@ elif [ $ok_flag -eq 2 ]; then
     	while IFS= read -r line; do
 			((line_number++))
 			if [ $((line_number % 2)) -eq 0 ]; then
-      			result=$(eval "$line")
-	  			echo $result
+				if [[ "${line:2}" == *"$EXECUTABLE_PATH"* ]]; then
+      				result=$(eval "$line")
+	  				echo $result
+				fi
 			else
             	echo "$line"
         	fi
@@ -216,8 +249,10 @@ else
 	if [ -f "$TRACE_FILE" ]; then
 		echo -e "\n----TRACE----"
     	while IFS= read -r line; do
-      		result=$(eval "$line")
-	  		echo $result
+			if [[ "${line:2}" == *"$EXECUTABLE_PATH"* ]]; then
+      			result=$(eval "$line")
+	  			echo $result
+			fi
     	done < "$TRACE_FILE"
 	fi
 fi
