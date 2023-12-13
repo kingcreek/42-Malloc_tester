@@ -194,6 +194,7 @@ INTERPOSE_C_VOID(free, (void *p), (p)) // Maybe one day i will remember you and 
 	if (ignore_malloc == 0)
 	{
 		lock_mutex_malloc();
+		pthread_mutex_lock(&malloc_mutex);
 		void *caller = NULL;
 		int size = backtrace(callstack, sizeof(callstack) / sizeof(callstack[0]));
 		char **strings = backtrace_symbols(callstack, size);
@@ -203,6 +204,7 @@ INTERPOSE_C_VOID(free, (void *p), (p)) // Maybe one day i will remember you and 
 			Real__free(p);
 			Real__free(strings);
 			unlock_mutex_malloc();
+			pthread_mutex_unlock(&malloc_mutex);
 			return;
 		}
 
@@ -213,6 +215,7 @@ INTERPOSE_C_VOID(free, (void *p), (p)) // Maybe one day i will remember you and 
 				if (allocations[i].ptr == p)
 				{
 					allocations[i].size = 0;
+					allocations[i].ptr = (void*)0;
 					break;
 				}
 			}
@@ -221,6 +224,7 @@ INTERPOSE_C_VOID(free, (void *p), (p)) // Maybe one day i will remember you and 
 		Real__free(strings);
 		Real__free(p);
 		unlock_mutex_malloc();
+		pthread_mutex_unlock(&malloc_mutex);
 		return;
 	}
 

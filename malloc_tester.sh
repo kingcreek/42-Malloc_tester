@@ -20,7 +20,7 @@ FOLDER=".malloc_tester"
 ##############################################################################################
 
 ##############################################################################################
-CURRENTVERSION="2.5"
+CURRENTVERSION="2.6"
 
 github_url="https://github.com/kingcreek/42-Malloc_tester/raw/main/version.txt"
 if ! curl -s -L "$github_url" | grep -q $CURRENTVERSION; then
@@ -224,7 +224,7 @@ while true; do
   	fi
 done
 
-executable_name=$(basename "$EXECUTABLE_PATH")
+executable_name=$(basename "$EJECUTABLE")
 
 if [ $ok_flag -eq 99 ]; then
   echo -e "\n\033[32mOK\033[0m\n"
@@ -236,8 +236,12 @@ else
 		echo -e "\n----TRACE----"
     	while IFS= read -r line; do
         	result=$(eval "$line")
-			if [[ "${result}" == *"$executable_name"* ]]; then
-        		echo $result
+			if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+				echo $result
+			elif [[ "$OSTYPE" == "darwin"* ]]; then
+				if [[ "${result}" == *"$executable_name"* ]]; then
+        			echo $result
+				fi
 			fi
     	done < "$TRACE_FILE"
 	fi
@@ -250,9 +254,7 @@ if [ -f "$LEAKS_FILE" ] && [ -s "$LEAKS_FILE" ]; then
 		((line_number++))
 		if [ $((line_number % 2)) -eq 0 ]; then
 			result=$(eval "$line")
-			if [[ "${result}" == *"$executable_name"* ]]; then
-				echo $result
-			fi
+			echo $result
 		else
             echo "$line"
         fi
