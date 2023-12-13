@@ -239,7 +239,7 @@ int calculate_leaks()
 		if (allocations[i].size > 0)
 		{
 			char info[256] = {0};
-			snprintf(info, sizeof(info), "leak %ld bytes in %p", allocations[i].size, allocations[i].location);
+			snprintf(info, sizeof(info), "Total %ld bytes in %p", allocations[i].size, allocations[i].location);
 			write_in_file_simple(file_path, info);
 			write_in_file_simple(file_path, allocations[i].location);
 		}
