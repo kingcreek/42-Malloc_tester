@@ -6,7 +6,7 @@
 /*   By: imurugar <imurugar@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/08 10:12:02 by imurugar          #+#    #+#             */
-/*   Updated: 2023/09/17 03:12:49 by imurugar         ###   ########.fr       */
+/*   Updated: 2023/12/13 01:02:55 by imurugar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,6 +74,7 @@ void addr2line(const char* program_name, void const *const addr, char *file_path
 /* have addr2line map the address to the relent line in the code */
 #ifdef __APPLE__
 	/* apple does things differently... */
+	//sprintf(addr2line_cmd, "atos -d -o %.256s %p", program_name, addr);
 	sprintf(addr2line_cmd, "atos -o %.256s %p", program_name, addr);
 	write_in_file_simple(file_path, addr2line_cmd);
 #else

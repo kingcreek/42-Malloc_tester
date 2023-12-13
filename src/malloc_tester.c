@@ -6,7 +6,7 @@
 /*   By: imurugar <imurugar@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/08 10:12:07 by imurugar          #+#    #+#             */
-/*   Updated: 2023/12/10 17:41:05 by imurugar         ###   ########.fr       */
+/*   Updated: 2023/12/13 01:02:49 by imurugar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,35 @@ pthread_mutex_t malloc_mutex;
 static void lock_mutex_malloc() { ignore_malloc = 1; }	 // Personality disorder
 static void unlock_mutex_malloc() { ignore_malloc = 0; } // His brother
 
+//check
+// useful libunwind, otool
+// https://stackoverflow.com/questions/24523118/pstack-a-process-on-osx-10-9
+// https://apple.stackexchange.com/questions/272508/how-do-you-get-a-stack-trace-of-a-running-process
+
+//TO TEST
+/*
+#include <ucontext.h>
+void segfault_handler(int signal, siginfo_t* info, void* context) {
+
+	lock_mutex_malloc();
+	//try with this
+	//signal(SIGSEGV, SIG_DFL);
+    ucontext_t* ucontext = (ucontext_t*)context;
+    printf("EAX: %lu\n", ucontext->uc_mcontext.gregs[REG_RAX]);
+    printf("EBX: %lu\n", ucontext->uc_mcontext.gregs[REG_RBX]);
+	void* fault_address = info->si_addr;
+	printf("Segmentation fault at address: %p\n", fault_address);
+	void* program_counter = (void*)ucontext->uc_mcontext->__ss.__rip;
+	printf("Program Counter at address: %p\n", program_counter);
+	void* stack_pointer = (void*)ucontext->uc_mcontext->__ss.__rsp;
+	printf("Stack Pointer at address: %p\n", stack_pointer);
+	
+	write(1, "segmentation fault\n", 19);
+	if (end_program != 1)
+		get_trace();
+	exit(139);
+}
+*/
 void segfault_handler(int sig) // I catch you!
 {
 	lock_mutex_malloc();
@@ -65,6 +94,13 @@ __attribute__((constructor)) static void init()
 {
 	lock_mutex_malloc();
 	pthread_mutex_init(&malloc_mutex, NULL);
+	//TO TEST
+	/*
+	struct sigaction sa;
+    sa.sa_sigaction = segfault_handler;
+    sa.sa_flags = SA_SIGINFO;
+    sigaction(SIGSEGV, &sa, NULL);
+	*/
 	signal(SIGSEGV, segfault_handler);
 	atexit(program_finish);
 	const char *home_dir = getenv("HOME");
