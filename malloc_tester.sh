@@ -216,9 +216,9 @@ while true; do
 	elif [[ "$program_output" == *"double free"* ]]; then
 		ok_flag=1
     	break
-	elif [[ "$program_output" == *"===LEAKS==="* ]]; then
-		ok_flag=2
-    	break
+	# elif [[ "$program_output" == *"===LEAKS==="* ]]; then
+	# 	ok_flag=2
+    # 	break
   	elif [[ "$program_output" == *"Test completed correctly"* ]]; then
     	break
   	fi
@@ -228,22 +228,6 @@ if [ $ok_flag -eq 99 ]; then
   echo -e "\n\033[32mOK\033[0m\n"
 elif [ $ok_flag -eq 1 ]; then
   echo -e "\n\x1B[31mKO (double free)\x1B[0m"
-elif [ $ok_flag -eq 2 ]; then
-  echo -e "\n\x1B[33mKO (leaks)\x1B[0m"
-  if [ -f "$LEAKS_FILE" ]; then
-		line_number=0
-    	while IFS= read -r line; do
-			((line_number++))
-			if [ $((line_number % 2)) -eq 0 ]; then
-				if [[ "${line:2}" == *"$EXECUTABLE_PATH"* ]]; then
-      				result=$(eval "$line")
-	  				echo $result
-				fi
-			else
-            	echo "$line"
-        	fi
-    	done < "$LEAKS_FILE"
-	fi
 else
 	echo -e "\n\x1B[31mKO (Segfault)\x1B[0m"
 	if [ -f "$TRACE_FILE" ]; then
@@ -255,6 +239,22 @@ else
 			fi
     	done < "$TRACE_FILE"
 	fi
+fi
+
+if [ -f "$LEAKS_FILE" ] && [ -s "$LEAKS_FILE" ]; then
+	echo -e "\n\x1B[33mPROGRAM END WITHOUT FREEING ALL MEMORY\x1B[0m"
+	line_number=0
+	while IFS= read -r line; do
+		((line_number++))
+		if [ $((line_number % 2)) -eq 0 ]; then
+			if [[ "${line:2}" == *"$EXECUTABLE_PATH"* ]]; then
+      			result=$(eval "$line")
+	  			echo $result
+			fi
+		else
+            echo "$line"
+        fi
+    done < "$LEAKS_FILE"
 fi
 
 
