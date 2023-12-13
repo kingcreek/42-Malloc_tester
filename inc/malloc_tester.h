@@ -6,7 +6,7 @@
 /*   By: imurugar <imurugar@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/08 10:12:50 by imurugar          #+#    #+#             */
-/*   Updated: 2023/09/17 02:39:26 by imurugar         ###   ########.fr       */
+/*   Updated: 2023/12/13 19:15:39 by imurugar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@
 
 /*Functions that do things*/
 void get_function_names(char *input);
-void get_trace();
+void get_trace(void *program_counter);
 void program_finish();
 void get_program_name(char *program_name, size_t size);
 void get_main_code_range_linux(uintptr_t* start, uintptr_t* end);

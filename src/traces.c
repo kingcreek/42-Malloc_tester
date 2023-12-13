@@ -6,7 +6,7 @@
 /*   By: imurugar <imurugar@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/08 10:12:02 by imurugar          #+#    #+#             */
-/*   Updated: 2023/12/13 01:02:55 by imurugar         ###   ########.fr       */
+/*   Updated: 2023/12/13 19:16:47 by imurugar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,7 +91,7 @@ void addr2line(const char* program_name, void const *const addr, char *file_path
 
 #define MAX_STACK_FRAMES 10
 static void *stack_traces[MAX_STACK_FRAMES];
-void get_trace()
+void get_trace(void *program_counter)
 {
 	char program_name[256] = {0};
 	int i, trace_size = 0;
@@ -106,6 +106,9 @@ void get_trace()
 
 	get_program_name(program_name, sizeof(program_name));
 
+	if (program_counter)
+		addr2line(program_name, program_counter, file_path);
+		
 	for (i = 0; i < trace_size; ++i)
 	{
 		#ifdef __APPLE__
