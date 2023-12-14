@@ -90,6 +90,26 @@ void program_finish()
 	}
 	unlock_mutex_malloc();
 }
+/*
+#ifdef __SANITIZE_ADDRESS__
+#include <sanitizer/lsan_interface.h>
+#endif
+
+__attribute__((destructor)) static void destructor()
+{
+	fprintf(stdout, "Test  2\n");
+	lock_mutex_malloc();
+	if (end_program == 1)
+	{
+		if (calculate_leaks())
+			fprintf(stdout, "Test completed correctly\n");
+	}
+	#ifdef __SANITIZE_ADDRESS__
+        __lsan_do_leak_check();
+	#endif
+	unlock_mutex_malloc();
+}
+*/
 
 __attribute__((constructor)) static void init()
 {
