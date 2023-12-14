@@ -1,0 +1,454 @@
+export
+env
+pwd
+cd;pwd@cd
+pwd;cd "";pwd@cd ""
+cd " "
+cd "" ""
+cd / non_existent
+cd /.
+cd //
+cd ' / '
+pwd
+pwd argument
+pwd argument1 argument2
+touch file &> /dev/null
+cd file
+chmod 000 &> /dev/null
+cd file@cd file (no permission)
+cd file/non_existent
+chmod 777 file &> /dev/null
+rm -rf file &> /dev/null
+cd ~;cd non_exist@cd non_exist
+cd ..;pwd@cd ..
+cd ~;pwd@cd ~
+cd ..;cd ~;pwd@cd ~
+cd .
+mkdir testdirtest &> /dev/null;chmod 000 testdirtest &> /dev/null
+cd testdirtest;@cd testdirtest(no permision)
+chmod 666 testdirtest &> /dev/null;rm -rf testdirtest &> /dev/null
+cd 255chars255chars255chars255char255chars255chars255chars255chars255chars255chars255chars255chars255chars255chars255chars255chars255chars255chars255chars255chars255chars255chars255chars255chars255chars255chars255chars255chars255chars255chars255chars255chars@cd maxpathlen
+cd 256chars256chars256chars256chars256chars256chars256chars256chars256chars256chars256chars256chars256chars256chars256chars256chars256chars256chars256chars256chars256chars256chars256chars256chars256chars256chars256chars256chars256chars256chars256chars256chars@cd maxpathlen + 1
+echo
+echo ñ
+echo hi
+/bin/echo hi
+echo $PATH
+echo $NONEXIST
+echoecho
+echo -n
+echo -n hi
+echo --n hi
+echo -nn hi
+echo -n -n hi
+echo hi -n
+echo "-n -n -n" -n hi
+
+echo echo wtf u execute? > ~/echo 2> /dev/null; chmod 777 ~/echo;export EXPATH="$PATH" PATH="/Users/$USER:$PATH"
+echo this is the buildin gj@check if launch execve
+rm -rf ~/echo
+echo "include <stdio.h>" > ~/echo.c 2> /dev/null
+echo "int main() {" >> ~/echo.c 2> /dev/null
+echo 'printf("Thats the file bro gj\n");return 0;}' >> ~/echo.c 2> /dev/null
+gcc ~/echo.c -o echo; chmod 777 ~/echo;export EXPATH="$PATH" PATH="/Users/$USER:$PATH"
+eCho what u execute bro?;cat ~/echo@check if builtin is not correct
+echo what u execute bro?@EXECVE THE ECHO?
+rm -rf ~/echo ~/echo.c; export PATH="$EXPATH"
+
+export TESTVAR
+env | grep TESTVAR@env with export TESTVAR
+unset TESTVAR
+
+export TESTVAR=
+env | grep TESTVAR@env with export TESTVAR=
+unset TESTVAR
+
+export TESTVAR=""
+env | grep TESTVAR@env with export TESTVAR=""
+unset TESTVAR
+
+export TESTVAR="value"
+env | grep TESTVAR@env with export TESTVAR="value"
+unset TESTVAR
+
+export TESTVAR;env | grep TESTVAR@env with export TESTVAR (in mini)
+export TESTVAR=;env | grep TESTVAR@env with export TESTVAR= (in mini)
+export TESTVAR="";env | grep TESTVAR@env with export TESTVAR="" (in mini)
+export TESTVAR="value";env | grep TESTVAR@env with export TESTVAR"value" (in mini)
+
+export 1A=value
+export /A=value
+export A/=value
+export 'A=value'
+export ' A=value'
+export 'A =value'
+
+export TEST=test;export | grep TEST@export TEST=test
+export TEST=test TESTT=test2;export | grep TEST@export TEST=test TESTT=test2
+export TEST=test W:RON:G=wrong TESTT=test2;export | grep TEST wrong@export TEST=test W:RON:G=wrong TESTT=test2
+export EMPTY EMPTY_TOO= NOT_EMPTY=contnent;export | grep EMPTY@export EMPTY EMPTY_TOO= NOT_EMPTY=contnent
+export TEST=value TEST=value2;export | grep TEST@export TEST=value TEST=value2
+export TEST=value;export TEST+=" added value";export | grep TEST@export TEST+=" added value"
+export TEST=value;export | grep TEST@export existing variable
+export correct=correct wrong%=wrong;export | grep correct;export | grep wrong@export correct=correct wrong%=wrong
+export wrong%=wrong correct=correct;export | grep correct;export | grep wrong@export wrong%=wrong correct=correct
+export PATH='/usr/bin'; whoami
+
+echo hi;echo $?@echo $?
+
+echo $
+echo hi$
+echo '$ '
+echo $/
+echo "'$'"
+
+echo $'\\n' | cat -e@echo \$'\\n'
+echo $'\\r' | cat -e@echo \$'\\r'
+echo $'\\t' | cat -e@echo \$'\\t'
+
+echo $USER
+echo $NONEXIST
+echo $USER$PATH$PWD
+echo "$USER$PATH$PWD"
+echo '$USER$PATH$PWD'
+echo '$USER",$PATH,$PWD'
+echo $USER"$PATH"$PWD"USER"$PATH"$PWD"
+echo $USER'$PATH'$PWD'USER'$PATH'$PWD'
+
+$NONEXIST
+$NONEXIST $NONEXIST
+export TMPENVVAR;$TMPENVVAR@VAR: export TMPENVVAR
+export TMPENVVAR=echo
+$TMPENVVAR@VAR: export TMPENVVAR=echo
+export TMPENVVAR="         echo"
+$TMPENVVAR@VAR: export TMPENVVAR="  echo"
+export TMPENVVAR="         EcHO      hi"
+$TMPENVVAR@VAR: export TMPENVVAR="    EcHO   hi"
+export TMPENVVAR="-n"
+echo $TMPENVVAR hi@VAR: export TMPENVVAR="-n"
+export TMPENVVAR="-n -n"
+echo $TMPENVVAR hi@VAR: export TMPENVVAR="-n -n"
+export A='foo   ' B='bar   ' C='baz   '
+echo $A"$B"$C"A"$B"$C"
+echo $A'$B'$C'A'$B'$C'
+echo $A"$B"$C"A"$B"$C"
+echo $A'$B'$C'A'$B'$C'
+echo $A
+echo $A$B
+echo $A$B$C
+echo $A$B$C$AA
+unset A B C
+
+echo "~"ups
+echo '~'ups
+
+echo "'$'"
+echo '"$"'
+
+echo "|$USER|"
+echo "|$USE|"
+echo "|$USER_|"
+echo '|$USER|'
+echo '|$USE|'
+echo '|$USER_|'
+
+'echo' hi
+'''echo' hi
+'echo' 'hi'
+'echo' 'hi'''
+'echo' 'hi' ''
+
+"echo" hi
+"""echo" hi
+"echo" "hi"
+"echo" "hi"""
+"echo" "hi" ""
+echo '""""""""""""'
+'echo' "hi"'' " ' "' "' "" ''''''""
+
+echo hi"hi" hi'h"i'
+echo "hi" "hi"
+echo "hi"  "hi"
+echo "hi"\t"hi"@echo "hi"tab"hi"
+
+" echo"
+' echo'
+""echo
+" "echo
+''echo
+' 'echo
+''''''''''echo hi
+""""""""""echo hi
+"e"'c'h"o" hi
+ec""ho hi
+ec""h''o hi
+
+
+EcHo hi
+ECHO hi
+"ECHO" hi
+'ECHO' hi
+
+echo    \t  hi   \t    
+echo "   \t  hi   \t    "
+echo '   \t  hi   \t    '
+echo $"   \t  hi   \t    "
+echo $'   \t  hi   \t    '
+echo $'   \r  hi   \t    '
+
+echo hi > "fi le";rm "fi le"@echo hi > "fi le"
+echo hi > 'fi le';rm 'fi le'@echo hi > 'fi le'
+
+export ANA_VAR='.    hi,   this  is  the  hardest"  Ana  "test     '
+echo $ANA_VAR@echo $ANA_VAR with spaces in var value
+echo "$ANA_VAR"@echo "$ANA_VAR" with spaces in var value
+echo '$ANA_VAR'@echo '$ANA_VAR' with spaces in var value
+
+""
+" "
+  
+	echo hi@\\techo hi
+echo	hi@echo\\thi
+	echo	hi@\\techo\\thi
+	echo	hi@\\techo\\thi
+   	echo	hi@  \\techo\\thi
+	echo	   hi@\\techo\\t   hi
+
+
+			@many tabs
+            @many spaces
+test
+|test
+ | test
+< | test
+<< | test
+> | test
+>> | test
+| < test
+| << test
+| > test
+| >> test
+| test
+
+test | >  
+test | >>  
+test | <  
+
+echo hiecho hi
+echo hi|echo hi
+echo hi |echo hi
+echo hi| echo hi
+echo hi | | echo hi
+echo hi ||| echo hi
+
+echo >
+echo >>
+echo <
+echo >>>
+echo <<<
+echo hi >< file
+~
+echo hi~
+echo ~
+echo ~/path
+echo ~$USER
+echo ~false
+echo \~
+echo ~$USER/sdfsfsfdsfs
+unset HOME ; echo ~
+echo | /bin/cat
+echo hi | /bin/cat
+cat /etc/shells | head -c 10
+cat -e /etc/shells | head -c 10
+cat -e /etc/shells | cat -e | head -c 10
+cat -e /etc/shells | cat -e | cat -e | head -c 10
+echo hola | cat
+echo hola | cat -e
+echo hola | cat -e | cat -n
+echo hola | cat -e | cat -e | cat -e | cat -e | cat -e | cat -e | cat -e@echo hola with many pipes cat -e
+ls | cat -e
+ls -l | cat -e
+ls -l | cat -e | cat | cat | cat
+ls -l | cat -e | cat -e | cat -e | cat -e
+echo hola | asdf
+asdf | echo hola
+cat | cat | cat | ls
+sleep 1 | ls | cat -n
+
+mkdir folder &> /dev/null
+cd folder | pwd
+rmdir folder &> /dev/null
+
+ ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls |ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls |ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls |ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls |ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls |ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls@ls pipes (255)
+ ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls |ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls |ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls |ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls |ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls |ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls@ls pipes (256)
+ ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls |ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls |ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls |ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls |ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls |ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls | ls@ls pipes (257)
+ > no_cmd_file;cat no_cmd_file;rm no_cmd_file@> no_cmd_file
+>> no_cmd_test;cat no_cmd_test;rm no_cmd_test@>> no_cmd_test
+echo hola | > filepipe;cat filepipe;rm filepipe@echo hola | > filepipe
+> file_first | > file_second;cat file_first;cat file_second;rm file_first;rm file_second@> file_first | > file_second
+
+echo hi > file;cat file;rm file@echo hi > file
+echo hi >> file;echo hi >> file;cat file;rm file@echo hi >> file
+
+echo hi > *.txt;cat '*.txt';rm '*.txt'@echo hi > *.txt
+
+echo > file hi;cat file;rm file@echo >> file hi
+echo >> file hi;echo >> file hi;cat file;rm file@echo >> file2 hi
+
+> file echo hi;cat file;rm file@> file echo hi
+>> file echo hi;>> file echo hi;cat file;rm file@>> file echo hi
+
+echo hi > file2 > file hi;ls;cat file;rm file file2@echo hi > file2 > file hi
+echo hi >> file2 > file hi;echo hi >> file2 > file hi;ls;cat file;rm file file2@echo hi >> file2 > file hi
+echo hi > file2 >> file hi;echo hi > file2 >> file hi;ls;cat file;rm file file2@echo hi > file2 >> file hi
+echo hi > file2 > file hi;echo hi > file2 > file hi;ls;cat file;rm file file2@echo hi > file2 > file hi
+echo hi >> file2 >> file hi;echo hi >> file2 >> file hi;ls;cat file;rm file file2@echo hi >> file2 >> file hi
+echo hi>file2>file hi;ls;cat file;rm file file2@echo hi>file2>file hi
+echo hi>>file2>>file hi;ls;cat file;rm file file2@echo hi>>file2>>file hi
+
+echo hi > file3 > file2 > file hi;echo hii > file3 > file2 > file hii;ls;cat file;rm file file2 file3@echo hi > file3 > file2 > file hi
+echo hi > file3 >> file2 > file hi;echo hii > file3 >> file2 > file hii;ls;cat file;rm file file2 file3@echo hi > file3 >> file2 > file hi
+echo hi > file3 > file2 >> file hi;echo hii > file3 > file2 >> file hii;ls;cat file;rm file file2 file3@echo hi > file3 > file2 >> file hi
+echo hi >> file3 > file2 > file hi;echo hii >> file3 > file2 > file hii;ls;cat file;rm file file2 file3@echo hi >> file3 > file2 > file hi
+echo hi >> file3 > file2 >> file hi;echo hii >> file3 > file2 >> file hii;ls;cat file;rm file file2 file3@echo hi >> file3 > file2 >> file hi
+echo hi >> file3 >> file2 > file hi;echo hii >> file3 >> file2 > file hii;ls;cat file;rm file file2 file3@echo hi >> file3 >> file2 > file hi
+echo hi>file3>file2>file hi;ls;cat file;rm file file2 file3@echo hi>file3>file2>file hi
+
+> file3 echo hi > file2 > file hi;> file3 echo hi > file2 > file hi;ls;cat file;rm file file2 file3@> file3 echo hi > file2 > file hi
+> file3 echo hi > file2 >> file hi;> file3 echo hi > file2 >> file hi;ls;cat file;rm file file2 file3@> file3 echo hi > file2 >> file hi
+>> file3 echo hi > file2 > file hi;>> file3 echo hi > file2 > file hi;ls;cat file;rm file file2 file3@>> file3 echo hi > file2 > file hi
+> file3 echo hi >> file2 > file hi;> file3 echo hi >> file2 > file hi;ls;cat file;rm file file2 file3@> file3 echo hi >> file2 > file hi
+>file3 echo hi>file2>file hi;> file3 echo hi > file2 > file hi;ls;cat file;rm file file2 file3@>file3 echo hi>file2>file hi
+
+echo hi >filea>fileb>filec hi;echo hi >filea>fileb>filec hi;ls;cat filec;rm filea fileb filec@echo hi >filea>fileb>filec hi
+echo hi >filea>>fileb>filec hi;echo hi >filea>>fileb>filec hi;ls;cat filec;rm filea fileb filec@echo hi >filea>>fileb>filec hi
+echo hi >filea>fileb>>filec hi;echo hi >filea>fileb>>filec hi;ls;cat filec;rm filea fileb filec@echo hi >filea>fileb>>filec hi
+echo hi >>filea>fileb>filec hi;echo hi >>filea>fileb>filec hi;ls;cat filec;rm filea fileb filec@echo hi >>filea>fileb>filec hi
+
+echo hi > "doble"quote;cat doblequote;rm doblequote@echo hi > "doble"quote
+echo hi >"doble"quote;cat doblequote;rm doblequote@echo hi >"doble"quote
+echo -n hi >>"doble"quote;echo -n hi >>"doble"quote;cat doblequote;rm doblequote@echo -n hi >>"doble"quote
+
+echo hi > 'simple'quote;cat simplequote;rm simplequote@echo hi > 'simple'quote
+echo hi >'simple'quote;cat simplequote;rm simplequote@echo hi >'simple'quote
+echo -n hi >>'simple'quote;echo -n hi >>'simple'quote;cat simplequote;rm simplequote@echo -n hi >>'simple'quote
+
+echo hi > 'with spaces';cat 'with spaces';rm 'with spaces'@echo hi > 'with spaces'
+echo hi >>'with spaces';echo hi >>'with spaces';cat 'with spaces';rm 'with spaces'@echo hi >>'with spaces'
+
+echo hi > "mixed"'file 'name;cat "mixedfile name";rm "mixedfile name"@echo hi > "mixed"'file 'name
+echo hi >> "mixed"'file 'name;echo hi >> "mixed"'file 'name;cat "mixedfile name";rm "mixedfile name"@echo hi >> "mixed"'file 'name
+
+echo hi 0< file; rm file @echo hi 0> file
+bash 4> outpfile;echo hola >&4;cat outpfile; rm outpfile @4> file
+
+mkdir testfolder &> /dev/null
+echo hi > testfolder
+echo hi >> testfolder
+echo hi 2> testfolder
+echo hi 2>> testfolder
+
+chmod 000 testfolder &> /dev/null
+echo hi > testfolder
+echo hi >> testfolder
+echo hi 2> testfolder
+echo hi 2>> testfolder
+
+chmod 666 testfolder &> /dev/null
+rm -rf testfolder &> /dev/null
+
+touch file &> /dev/null && touch file2 &> /dev/null && touch file3 &> /dev/null
+chmod 000 file &> /dev/null && chmod 000 file2 &> /dev/null && chmod 000 file3 &> /dev/null
+echo > file hi;cat file;@echo > file hi (no permision)
+echo >> file2 hi;cat file2;@echo >> file2 hi (no permision)
+
+> file echo hi;cat file;@> file echo hi (no permision)
+>> file3 echo hi;cat file3;@>> file3 echo hi (no permision)
+
+chmod 666 file &> /dev/null && chmod 666 file2 &> /dev/null && chmod 666 file3 &> /dev/null
+rm file file2 file3 &> /dev/null
+
+echo hi, I am the file > file
+echo hi, I am the file2 > file2
+echo hi, I am the file3 > file3
+chmod 000 file3 &> /dev/null
+
+cat < file@cat < file
+< file cat < file2@< file cat < file2
+cat < nonexist@cat < nonexist
+cat < $USER@cat < $USER
+cat < file3@cat < file3 (no permision)
+
+chmod 666 file3 &> /dev/null
+
+rm file file2 file3 &> /dev/null
+
+echo hi 2> error_outp < non_exist@echo hi 2> error_outp < non_exist
+rm error_outp &> /dev/null
+
+echo hi < non_exist > wrong;ls;rm wrong@echo hi < non_exist > wrong
+< non_exist echo hi > wrong;ls;rm wrong@< non_exist echo hi > wrong
+> correct echo hi < non_exist;ls;rm correct@> correct echo hi < non_exist
+
+rm correct
+export SHLVL=20 &> /dev/null
+echo $SHLVL 'entry value 20'
+export SHLVL=50 &> /dev/null
+echo $SHLVL 'entry value 50'
+export SHLVL=99 &> /dev/null
+echo $SHLVL 'entry value 99'
+export SHLVL=-20 &> /dev/null
+echo $SHLVL 'entry value -20'
+export SHLVL=800 &> /dev/null
+echo $SHLVL 'entry value 800'
+export SHLVL=1000 &> /dev/null
+echo $SHLVL 'entry value 1000'
+export SHLVL=5000000 &> /dev/null
+echo $SHLVL 'entry value 5000000'
+
+unset SHLVL &> /dev/null
+echo $SHLVL 'unset SHLVL before ./minishell'
+export SHLVL='' &> /dev/null
+echo $SLVL 'export SHLVL='' before ./minishell'
+" ";echo $?
+" "
+
+echo $?
+
+cat < noexiste;echo $?
+cat < noexiste
+
+touch noperm &> /dev/null; chmod 000 noperm&> /dev/null
+
+echo hola > noperm ; echo $?
+echo hola > noperm
+echo hola < noperm ; echo $?
+echo hola < noperm
+
+chmod 666 nopem &> /dev/null; rm noperm &> /dev/null
+
+sleep 1 | ls | cat -n;echo $?
+sleep 1 | ls | cat -n
+sleep 1 | dddd;echo $?
+sleep 1 | dddd
+
+nonexistcmd; echo $?
+nonexistcmd
+
+nonexistcmd | echo hi; echo $?
+nonexistcmd | echo hi
+
+echo hi | nonexistcmd; echo $?
+echo hi | nonexistcmd
+
+echo hi < nofile | nonexistcmd; echo $?
+echo hi < nofile | nonexistcmd
+
+echo hi < nofile | echo hii; echo $?
+echo hi < nofile | echo hii
+
+/Users/nonexist/directory;echo $?
+/Users/nonexist/directory
+
+cat /Users/nonexist/directory;echo $?
+cat /Users/nonexist/directory
