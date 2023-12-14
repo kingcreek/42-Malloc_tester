@@ -48,17 +48,4 @@ To make everything a little easier, from the docker command you can copy the pro
 
 -Run `malloc_tester` in the terminal to start the program, type the name of your executable when prompted, you can add arguments if necessary: `./a.out <optional args>`
 
-# Compilation
-
-Compile in Linux:
-`make`
-
-Load shared lib:
-`LD_PRELOAD=./malloc_tester.so ./Your_Program <optional args>`
-
-Compile in MacOs:
-`make`
-
-Load shared DyLib:
-`DYLD_INSERT_LIBRARIES=./malloc_tester.dylib ./Your_Program <optional args>`
 
