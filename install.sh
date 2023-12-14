@@ -38,10 +38,6 @@ if [ "$SO" == "linux" ]; then
 	# fi
 fi
 
-if ! grep "malloc_tester=" "$RC_FILE" &> /dev/null; then
-	printf "\nalias malloc_tester=%s/malloc_tester.sh\n" "$HOME/$FOLDER" >> "$RC_FILE"
-fi
-
 if ! grep "king=" "$RC_FILE" &> /dev/null; then
 	printf "\nalias king=%s/malloc_tester.sh\n" "$HOME/$FOLDER" >> "$RC_FILE"
 fi
@@ -51,6 +47,6 @@ if ! grep "amparette=" "$RC_FILE" &> /dev/null; then
 fi
 
 cd "$CURRENT_PWD"
-echo "Configuration completed. You can run 'malloc_tester' to run the program."
+echo "Configuration completed. You can run 'amparette' to run the program."
 
 exec "$SHELL"
