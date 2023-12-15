@@ -3,14 +3,16 @@
 ##############################################################################################
 
 show_welcome_message() {
-  echo " _    _                                _    ";
-  echo "| |  (_)                              | |   ";
-  echo "| | ___ _ __   __ _  ___ _ __ ___  ___| | __";
-  echo "| |/ / | '_ \ / _\` |/ __| '__/ _ \/ _ \ |/ /";
-  echo "|   <| | | | | (_| | (__| | |  __/  __/   < ";
-  echo "|_|\_\_|_| |_|\__, |\___|_|  \___|\___|_|\_\\";
-  echo "               __/ |                        ";
-  echo "              |___/                         ";
+  echo -n "\n\033[32m";
+  echo -n " _    _                                _    ";
+  echo -n "| |  (_)                              | |   ";
+  echo -n "| | ___ _ __   __ _  ___ _ __ ___  ___| | __";
+  echo -n "| |/ / | '_ \ / _\` |/ __| '__/ _ \/ _ \ |/ /";
+  echo -n "|   <| | | | | (_| | (__| | |  __/  __/   < ";
+  echo -n "|_|\_\_|_| |_|\__, |\___|_|  \___|\___|_|\_\\";
+  echo -n "               __/ |                        ";
+  echo -n "              |___/                         ";
+  echo -n "\033[0m\n";
 }
 
 show_welcome_message
@@ -24,7 +26,7 @@ CURRENTVERSION="2.9.1"
 
 github_url="https://github.com/kingcreek/42-Malloc_tester/raw/main/version.txt"
 if ! curl -s -L -H "$github_url" | grep -q $CURRENTVERSION; then
-  echo "UPDATING..."
+  echo -n "\n\033[32m UPDATING... \033[0m\n"
   bash -c "$(curl -fsSL https://github.com/kingcreek/42-Malloc_tester/raw/main/install.sh)"
   exit
 fi
