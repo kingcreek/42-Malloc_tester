@@ -22,10 +22,10 @@ FOLDER=".malloc_tester"
 ##############################################################################################
 
 ##############################################################################################
-CURRENTVERSION="2.9.1"
+CURRENTVERSION="3.0"
 
 github_url="https://github.com/kingcreek/42-Malloc_tester/raw/main/version.txt"
-if ! curl -s -L -H "$github_url" | grep -q $CURRENTVERSION; then
+if ! curl -s -L "$github_url" | grep -q $CURRENTVERSION; then
   echo -n "\n\033[32m UPDATING... \033[0m\n"
   bash -c "$(curl -fsSL https://github.com/kingcreek/42-Malloc_tester/raw/main/install.sh)"
   exit
