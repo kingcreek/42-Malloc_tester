@@ -20,7 +20,7 @@ FOLDER=".malloc_tester"
 ##############################################################################################
 
 ##############################################################################################
-CURRENTVERSION="2.7"
+CURRENTVERSION="2.8"
 
 github_url="https://github.com/kingcreek/42-Malloc_tester/raw/main/version.txt"
 if ! curl -s -L "$github_url" | grep -q $CURRENTVERSION; then
@@ -165,6 +165,17 @@ if [[ "$EXECUTABLE_PATH" == "functions "* ]]; then
   exit 1
 fi
 
+if [[ "$EXECUTABLE_PATH" == "asm "* ]]; then
+	PROGRAM_NAME=$(echo "$EXECUTABLE_PATH" | cut -d' ' -f2)
+	if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+  		objdump -d "$PROGRAM_NAME"
+  		exit 1
+	elif [[ "$OSTYPE" == "darwin"* ]]; then
+		otool -tV "$PROGRAM_NAME"
+  		exit 1
+	fi
+fi
+
 ##############################################################################################
 
 EJECUTABLE=$(echo "$EXECUTABLE_PATH" | awk '{print $1}')
@@ -186,7 +197,7 @@ if [[ ! "$EXECUTABLE_PATH" =~ ^\./ ]]; then
     EXECUTABLE_PATH="./$EXECUTABLE_PATH"
 fi
 
-if objdump -t "$EXECUTABLE_PATH" | grep -q "__asan_"; then
+if nm -a "$EXECUTABLE_PATH" | grep _asan; then
     echo -e "\n\x1B[31m Your program is compiled with the fsanitize flag, please recompile the program without that flag for correct functioning of the tester. \x1B[0m"
 	exit
 fi
