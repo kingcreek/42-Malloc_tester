@@ -22,7 +22,7 @@ FOLDER=".malloc_tester"
 ##############################################################################################
 
 ##############################################################################################
-CURRENTVERSION="3.0"
+CURRENTVERSION="2.9.2"
 
 # github_url="https://github.com/kingcreek/42-Malloc_tester/raw/main/version.txt"
 # if ! curl -s -L "$github_url" | grep -q $CURRENTVERSION; then
@@ -31,7 +31,7 @@ CURRENTVERSION="3.0"
 #   exit
 # fi
 github_url="https://github.com/kingcreek/42-Malloc_tester/raw/main/version.txt"
-downloaded_version=$(curl -s -L "$github_url" | grep -o 'rawLines":\["[^"]*' | awk -F '["[]' '{print $3}')
+downloaded_version=$(curl -s -L "$github_url" | grep -o 'rawLines":\["[^"]*' | awk -F '[:,[]"' '{print $2}')
 
 echo $downloaded_version
 if [ "$downloaded_version" != "$CURRENTVERSION" ]; then
