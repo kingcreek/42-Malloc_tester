@@ -23,7 +23,7 @@ FOLDER=".malloc_tester"
 CURRENTVERSION="2.9"
 
 github_url="https://github.com/kingcreek/42-Malloc_tester/raw/main/version.txt"
-if ! curl -s -L "$github_url" | grep -q $CURRENTVERSION; then
+if ! curl -s -L -H "$github_url" | grep -q $CURRENTVERSION; then
   echo "UPDATING..."
   bash -c "$(curl -fsSL https://github.com/kingcreek/42-Malloc_tester/raw/main/install.sh)"
   exit
