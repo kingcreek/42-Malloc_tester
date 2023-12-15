@@ -20,7 +20,7 @@ FOLDER=".malloc_tester"
 ##############################################################################################
 
 ##############################################################################################
-CURRENTVERSION="2.6"
+CURRENTVERSION="2.7"
 
 github_url="https://github.com/kingcreek/42-Malloc_tester/raw/main/version.txt"
 if ! curl -s -L "$github_url" | grep -q $CURRENTVERSION; then
@@ -35,6 +35,7 @@ fi
 ADDRESSFILE=$HOME/$FOLDER/address.0x00
 TRACE_FILE="$HOME/$FOLDER/trace"
 LEAKS_FILE="$HOME/$FOLDER/leaks"
+NO_ALLOC="$HOME/$FOLDER/noalloc"
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
 	# LOCAL_LIBRARY_NAME="./malloc_tester.so"
@@ -173,7 +174,6 @@ if [ ! -f "$EJECUTABLE" ]; then
   exit 1
 fi
 file_type=$(file -b "$EJECUTABLE")
-echo $EJECUTABLE
 if [[ $file_type != *64* ]]; then
 	echo "Invalid file."
 	exit 1
@@ -186,6 +186,16 @@ if [[ ! "$EXECUTABLE_PATH" =~ ^\./ ]]; then
     EXECUTABLE_PATH="./$EXECUTABLE_PATH"
 fi
 
+if objdump -t "$EXECUTABLE_PATH" | grep -q "__asan_"; then
+    echo -e "\n\x1B[31m Your program is compiled with the fsanitize flag, please recompile the program without that flag for correct functioning of the tester. \x1B[0m"
+	exit
+fi
+
+if ! readelf -S "$EXECUTABLE_PATH" | grep -q '\.debug'; then
+    echo -e "\n\x1B[31m Your program is not compiled with -g, please compile with said flag for better results. \x1B[0m"
+	exit
+fi
+
 echo "Launch $EXECUTABLE_PATH with lib injected..."
 
 ok_flag=99
@@ -196,12 +206,19 @@ while true; do
 	touch $TRACE_FILE
 	rm -f $LEAKS_FILE
 	touch $LEAKS_FILE
+	rm -f $NO_ALLOC
+	touch $NO_ALLOC
+
 	# fi
-	#program_output=$(eval "$LOAD_FUNCTION=./$LOCAL_LIBRARY_NAME $EXECUTABLE_PATH" 2>&1 | tee /dev/tty)
+	# program_output=$(eval "$LOAD_FUNCTION=$LOCAL_LIBRARY_NAME $EXECUTABLE_PATH" | tee /dev/tty)
 	program_output=$(eval "$LOAD_FUNCTION=$LOCAL_LIBRARY_NAME $EXECUTABLE_PATH" | tee /dev/tty)
   	program_result=$?
-  
-  	if [ $program_result -eq 139 ]; then
+	
+	if [[ "$program_output" == *"Program: Abort"* || "$program_output" == *"Program: Bus error"* ]]; then
+    	echo -e "\n\x1B[31m HAVE PROBLEMS HERE!. \x1B[0m"
+		echo -e "\n\x1B[31m Your program works without amparette? \x1B[0m"
+		exit
+  	elif [ $program_result -eq 139 ]; then
     	ok_flag=0
     	break
 	elif [[ "$program_output" == *"segmentation fault"* ]]; then
@@ -210,15 +227,9 @@ while true; do
 	elif [[ "$program_output" == *"Segmentation fault"* ]]; then
 		ok_flag=0
     	break
-	elif [[ "$program_output" == *"pointer being freed was not allocated"* ]]; then
+	elif [[ "$program_output" == *"Pointer being freed was not allocated"* ]]; then
 		ok_flag=1
     	break
-	elif [[ "$program_output" == *"double free"* ]]; then
-		ok_flag=1
-    	break
-	# elif [[ "$program_output" == *"===LEAKS==="* ]]; then
-	# 	ok_flag=2
-    # 	break
   	elif [[ "$program_output" == *"Test completed correctly"* ]]; then
     	break
   	fi
@@ -227,11 +238,11 @@ done
 executable_name=$(basename "$EJECUTABLE")
 
 if [ $ok_flag -eq 99 ]; then
-  echo -e "\n\033[32mOK\033[0m\n"
+  echo -e "\n\033[32m OK!! \033[0m\n"
 elif [ $ok_flag -eq 1 ]; then
-  echo -e "\n\x1B[31mKO (double free)\x1B[0m"
+  echo -e "\n\x1B[31m KO (double free) \x1B[0m"
 else
-	echo -e "\n\x1B[31mKO (Segfault)\x1B[0m"
+	echo -e "\n\x1B[31m KO (Segfault) \x1B[0m"
 	if [ -f "$TRACE_FILE" ]; then
 		echo -e "\n----TRACE----"
     	while IFS= read -r line; do
@@ -248,7 +259,7 @@ else
 fi
 
 if [ -f "$LEAKS_FILE" ] && [ -s "$LEAKS_FILE" ]; then
-	echo -e "\n\x1B[33mPROGRAM END WITHOUT FREEING ALL MEMORY\x1B[0m"
+	echo -e "\n\x1B[33m PROGRAM END WITHOUT FREEING ALL MEMORY \x1B[0m"
 	line_number=0
 	while IFS= read -r line; do
 		((line_number++))
@@ -261,12 +272,27 @@ if [ -f "$LEAKS_FILE" ] && [ -s "$LEAKS_FILE" ]; then
     done < "$LEAKS_FILE"
 fi
 
+# if [ -f "$NO_ALLOC" ] && [ -s "$NO_ALLOC" ]; then
+# 	echo -e "\n\x1B[33m POINTER BEING FREED WAS NOT ALLOCATED \x1B[0m"
+# 	line_number=0
+# 	while IFS= read -r line; do
+# 		result=$(eval "$line")
+# 		if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+# 			echo $result
+# 		elif [[ "$OSTYPE" == "darwin"* ]]; then
+# 			if [[ "${result}" == *"$executable_name"* ]]; then
+#         		echo $result
+# 			fi
+# 		fi
+#     done < "$NO_ALLOC"
+# fi
 
 
 
 rm -f $ADDRESSFILE
 rm -f $TRACE_FILE
 rm -f $LEAKS_FILE
+rm -f $NO_ALLOC
 
 echo -e "\n"
 

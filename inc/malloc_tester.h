@@ -6,7 +6,7 @@
 /*   By: imurugar <imurugar@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/08 10:12:50 by imurugar          #+#    #+#             */
-/*   Updated: 2023/12/13 19:15:39 by imurugar         ###   ########.fr       */
+/*   Updated: 2023/12/14 21:07:29 by imurugar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,7 @@ int read_int_from_file(const char *path);
 int write_in_file_replace(const char *file, const char *str);
 int calculate_leaks();
 char *malloc_location(const char *program_name, void const *const addr);
+//void print_double_free(char **strings, void *stack_traces[], int size);
 intptr_t getSlide();
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: imurugar <imurugar@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/08 10:12:07 by imurugar          #+#    #+#             */
-/*   Updated: 2023/12/13 19:15:33 by imurugar         ###   ########.fr       */
+/*   Updated: 2023/12/14 21:06:10 by imurugar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,29 +41,29 @@ pthread_mutex_t malloc_mutex;
 static void lock_mutex_malloc() { ignore_malloc = 1; }	 // Personality disorder
 static void unlock_mutex_malloc() { ignore_malloc = 0; } // His brother
 
-//check
-// useful libunwind, otool
-// https://stackoverflow.com/questions/24523118/pstack-a-process-on-osx-10-9
-// https://apple.stackexchange.com/questions/272508/how-do-you-get-a-stack-trace-of-a-running-process
-
-// atos -o a.out 0x100000F50
-
-//TO TEST
+// check
+//  useful libunwind, otool
 
 #define _XOPEN_SOURCE 700
 #include <ucontext.h>
-void segfault_handler(int signal, siginfo_t* info, void* context) {
-
+void segfault_handler(int signal, siginfo_t *info, void *context)
+{
 	lock_mutex_malloc();
-	//try with this
-	//signal(SIGSEGV, SIG_DFL);
-    ucontext_t* ucontext = (ucontext_t*)context;
-	void* program_counter = NULL;
-	
-	#ifdef __APPLE__
-		program_counter = (void*)ucontext->uc_mcontext->__ss.__rip - getSlide();
-	#endif
-	
+	if (signal == SIGABRT)
+	{
+		write(1, "Program: Abort\n", 15);
+		exit(139);
+	}
+	if (signal == SIGBUS)
+	{
+		write(1, "Program: Bus error\n", 19);
+		exit(139);
+	}
+	ucontext_t *ucontext = (ucontext_t *)context;
+	void *program_counter = NULL;
+#ifdef __APPLE__
+	program_counter = (void *)ucontext->uc_mcontext->__ss.__rip - getSlide();
+#endif
 	write(1, "segmentation fault\n", 19);
 	if (end_program != 1)
 		get_trace(program_counter);
@@ -88,6 +88,8 @@ void program_finish()
 		if (calculate_leaks())
 			fprintf(stdout, "Test completed correctly\n");
 	}
+	else
+		exit(138);
 	unlock_mutex_malloc();
 }
 /*
@@ -105,7 +107,7 @@ __attribute__((destructor)) static void destructor()
 			fprintf(stdout, "Test completed correctly\n");
 	}
 	#ifdef __SANITIZE_ADDRESS__
-        __lsan_do_leak_check();
+		__lsan_do_leak_check();
 	#endif
 	unlock_mutex_malloc();
 }
@@ -115,14 +117,16 @@ __attribute__((constructor)) static void init()
 {
 	lock_mutex_malloc();
 	pthread_mutex_init(&malloc_mutex, NULL);
-	//TO TEST
-	
+	// TO TEST
+
 	struct sigaction sa;
-    sa.sa_sigaction = segfault_handler;
-    sa.sa_flags = SA_SIGINFO;
-    sigaction(SIGSEGV, &sa, NULL);
-	
-	//signal(SIGSEGV, segfault_handler);
+	sa.sa_sigaction = segfault_handler;
+	sa.sa_flags = SA_SIGINFO;
+	sigaction(SIGSEGV, &sa, NULL);
+	sigaction(SIGBUS, &sa, NULL);
+	sigaction(SIGABRT, &sa, NULL);
+
+	// signal(SIGSEGV, segfault_handler);
 	atexit(program_finish);
 	const char *home_dir = getenv("HOME");
 	if (home_dir != NULL)
@@ -214,7 +218,6 @@ INTERPOSE_C_VOID(free, (void *p), (p)) // Maybe one day i will remember you and 
 	if (ignore_malloc == 0)
 	{
 		lock_mutex_malloc();
-		pthread_mutex_lock(&malloc_mutex);
 		void *caller = NULL;
 		int size = backtrace(callstack, sizeof(callstack) / sizeof(callstack[0]));
 		char **strings = backtrace_symbols(callstack, size);
@@ -227,20 +230,28 @@ INTERPOSE_C_VOID(free, (void *p), (p)) // Maybe one day i will remember you and 
 			pthread_mutex_unlock(&malloc_mutex);
 			return;
 		}
-
+		pthread_mutex_lock(&malloc_mutex);
 		if (strstr(strings[1], program_name) != NULL)
 		{
+			int freed = 0;
 			for (int i = 0; i < malloc_counter; i++)
 			{
 				if (allocations[i].ptr == p)
 				{
 					allocations[i].size = 0;
-					allocations[i].ptr = (void*)0;
+					allocations[i].ptr = (void *)0;
+					freed = 1;
 					break;
 				}
 			}
+			/*
+			if (freed == 0)
+			{
+				print_double_free(strings, callstack, size);
+				exit(1);
+			}
+			*/
 		}
-
 		Real__free(strings);
 		Real__free(p);
 		unlock_mutex_malloc();
@@ -277,43 +288,21 @@ int calculate_leaks()
 	return (1);
 }
 
-char *malloc_location(const char *program_name, void const *const addr)
-{
-	char addr2line_cmd[512] = {0};
-
-/* have addr2line map the address to the relent line in the code */
-#ifdef __APPLE__
-	/* apple does things differently... */
-	sprintf(addr2line_cmd, "atos -o %.256s %p", program_name, addr);
-	// write_in_file_simple(file_path, addr2line_cmd);
-#else
-	char p_name[256];
-	unsigned long long address;
-	int result = sscanf(program_name, "%[^+(]%*c%llx", p_name, &address);
-	if (result == 2)
-	{
-		sprintf(addr2line_cmd, "addr2line -e  %s + %#llx", p_name, address);
-		// write_in_file_simple(file_path, addr2line_cmd);
-	}
-#endif
-	return strdup(addr2line_cmd);
-}
-
 intptr_t getSlide()
 {
-	#ifdef __APPLE__
-    const struct mach_header *header;
-    intptr_t slide = 0;
+#ifdef __APPLE__
+	const struct mach_header *header;
+	intptr_t slide = 0;
 
-    header = _dyld_get_image_header(0);  // 0 significa el binario principal
+	header = _dyld_get_image_header(0); // 0 significa el binario principal
 
-    if (header != NULL) {
-        slide = _dyld_get_image_vmaddr_slide(0);
-        //printf("Slide: %#lx\n", (unsigned long)slide);
-    }
+	if (header != NULL)
+	{
+		slide = _dyld_get_image_vmaddr_slide(0);
+		// printf("Slide: %#lx\n", (unsigned long)slide);
+	}
 	return slide;
-	#else
+#else
 	return 0;
-	#endif
+#endif
 }
-
