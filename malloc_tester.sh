@@ -30,7 +30,7 @@ CURRENTVERSION="2.9.2"
 #   bash -c "$(curl -fsSL https://github.com/kingcreek/42-Malloc_tester/raw/main/install.sh)"
 #   exit
 # fi
-github_url="https://github.com/kingcreek/42-Malloc_tester/raw/main/version.txt"
+github_url="https://github.com/kingcreek/42-Malloc_tester/blob/main/version.txt"
 downloaded_version=$(curl -s -L "$github_url" | grep -o 'rawLines":\["[^"]*' | awk -F '[:,[]"' '{print $2}')
 
 echo $downloaded_version
