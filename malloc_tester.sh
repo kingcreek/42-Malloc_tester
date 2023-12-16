@@ -22,7 +22,7 @@ FOLDER=".malloc_tester"
 ##############################################################################################
 
 ##############################################################################################
-CURRENTVERSION="2.9.5"
+CURRENTVERSION="2.9.6"
 
 # github_url="https://github.com/kingcreek/42-Malloc_tester/raw/main/version.txt"
 # if ! curl -s -L "$github_url" | grep -q $CURRENTVERSION; then
@@ -212,9 +212,16 @@ if nm -a "$EXECUTABLE_PATH" 2>&1 | grep -q _asan; then
 	exit
 fi
 
-if ! nm -a "$EXECUTABLE_PATH" | grep 'ENSYM'; then
-    echo -e "\n\x1B[31m Your program is not compiled with -g, please compile with said flag for better results. \x1B[0m"
-	exit
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+	if ! readelf -S "$EXECUTABLE_PATH" | grep -q '\.debug'; then
+    	echo -e "\n\x1B[31m Your program is not compiled with -g, please compile with said flag for better results. \x1B[0m"
+		exit
+	fi
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+	if ! nm -a "$EXECUTABLE_PATH" | grep 'ENSYM'; then
+    	echo -e "\n\x1B[31m Your program is not compiled with -g, please compile with said flag for better results. \x1B[0m"
+		exit
+	fi
 fi
 
 echo "Launch $EXECUTABLE_PATH with lib injected..."
