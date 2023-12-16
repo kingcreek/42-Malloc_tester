@@ -212,7 +212,7 @@ if nm -a "$EXECUTABLE_PATH" 2>&1 | grep -q _asan; then
 	exit
 fi
 
-if ! readelf -S "$EXECUTABLE_PATH" | grep -q '\.debug'; then
+if ! nm -a "$EXECUTABLE_PATH" | grep 'ENSYM'; then
     echo -e "\n\x1B[31m Your program is not compiled with -g, please compile with said flag for better results. \x1B[0m"
 	exit
 fi
