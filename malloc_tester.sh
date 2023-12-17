@@ -22,7 +22,7 @@ FOLDER=".malloc_tester"
 ##############################################################################################
 
 ##############################################################################################
-CURRENTVERSION="2.9.7"
+CURRENTVERSION="2.9.8"
 
 # github_url="https://github.com/kingcreek/42-Malloc_tester/raw/main/version.txt"
 # if ! curl -s -L "$github_url" | grep -q $CURRENTVERSION; then
@@ -190,6 +190,9 @@ fi
 
 EJECUTABLE=$(echo "$EXECUTABLE_PATH" | awk '{print $1}')
 
+echo $EJECUTABLE
+echo $EXECUTABLE_PATH
+
 if [ ! -f "$EJECUTABLE" ]; then
   echo "The executable does not exist in the specified location."
   exit 1
@@ -207,20 +210,20 @@ if [[ ! "$EXECUTABLE_PATH" =~ ^\./ ]]; then
     EXECUTABLE_PATH="./$EXECUTABLE_PATH"
 fi
 
-if nm -a "$EXECUTABLE_PATH" 2>&1 | grep -q _asan; then
+if nm -a "$EJECUTABLE" 2>&1 | grep -q _asan; then
     echo -e "\n\x1B[31m Your program is compiled with the fsanitize flag, please recompile the program without that flag for correct functioning of the tester. \x1B[0m"
 	exit
 fi
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-	if ! readelf -S "$EXECUTABLE_PATH" | grep -q '\.debug'; then
-    	#	echo -e "\n\x1B[31m Your program is not compiled with -g, please compile with said flag for better results. \x1B[0m"
-	#	exit
+	if ! readelf -S "$EJECUTABLE" | grep -q '\.debug'; then
+		echo -e "\n\x1B[31m Your program is not compiled with -g, please compile with said flag for better results. \x1B[0m"
+		exit
 	fi
 elif [[ "$OSTYPE" == "darwin"* ]]; then
-	if ! nm -a "$EXECUTABLE_PATH" | grep 'ENSYM'; then
-    	#	echo -e "\n\x1B[31m Your program is not compiled with -g, please compile with said flag for better results. \x1B[0m"
-	#	exit
+	if ! nm -a "$EJECUTABLE" | grep 'ENSYM'; then
+		echo -e "\n\x1B[31m Your program is not compiled with -g, please compile with said flag for better results. \x1B[0m"
+		exit
 	fi
 fi
 
