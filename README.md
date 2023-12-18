@@ -48,4 +48,6 @@ To make everything a little easier, from the docker command you can copy the pro
 
 -Run `malloc_tester` in the terminal to start the program, type the name of your executable when prompted, you can add arguments if necessary: `./a.out <optional args>`
 
+# BUGS
+-I have identified a problem in MacOS, rarely reports one more line number in the backtrace, the segmentation fault line is correct but the function invocation line is not.
 
