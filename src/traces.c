@@ -73,6 +73,7 @@ void addr2line(const char *program_name, void const *const addr, char *file_path
 #ifdef __APPLE__
 	/* apple does things differently... */
 	// sprintf(addr2line_cmd, "atos -d -o %.256s %p", program_name, addr);
+
 	sprintf(addr2line_cmd, "atos -o %.256s %p", program_name, addr);
 	write_in_file_simple(file_path, addr2line_cmd);
 #else
@@ -110,7 +111,7 @@ void get_trace(void *program_counter)
 	for (i = 0; i < trace_size; ++i)
 	{
 #ifdef __APPLE__
-		addr2line(program_name, stack_traces[i] - getSlide(), file_path);
+		addr2line(program_name, stack_traces[i] - 0x01 - getSlide(), file_path);
 #else
 		addr2line(messages[i], stack_traces[i], file_path);
 #endif
