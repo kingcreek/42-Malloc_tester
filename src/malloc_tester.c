@@ -19,6 +19,7 @@
 void *callstack[MAX_CALLSTACK_SIZE];
 
 char file_path[256] = {0};
+char file_mlx_path[256] = {0};
 
 #define MAX_ALLOCATIONS 99999
 
@@ -138,8 +139,8 @@ __attribute__((constructor)) static void init()
 		snprintf(file_path, sizeof(file_path), "%s/.malloc_tester/address.0x00", home_dir);
 		totalMallocs = read_int_from_file(file_path);
 
-		snprintf(file_path, sizeof(file_path), "%s/.malloc_tester/minilib", home_dir);
-		read_mlx_position(file_path, &mlx_end, &mlx_init);
+		snprintf(file_mlx_path, sizeof(file_mlx_path), "%s/.malloc_tester/minilib", home_dir);
+		read_mlx_position(file_mlx_path, &mlx_end, &mlx_init);
 	}
 	ignore_malloc = 0;
 	malloc_counter = 0;
@@ -175,22 +176,22 @@ INTERPOSE_C(void *, malloc, (size_t sz), (sz)) // Magic
 				if (mlx_init != 0)
 				{
 					addr = (unsigned long long)(callstack[1] - getSlide());
-					if(addr >= mlx_init && addr <= mlx_end)
+					if(addr >= mlx_init)// && addr <= mlx_end)
 					{
 						pthread_mutex_unlock(&malloc_mutex);
-						unlock_mutex_malloc();
 						free(strings);
+						unlock_mutex_malloc();
 						return Real__malloc(sz);
 					}
 				}
 				#else
 				unsigned long long addr = 0;
 				if (mlx_init != 0 && sscanf(strings[1], "./cub3D(+0x%llx)", &addr) == 1) {
-					if(addr >= mlx_init && addr <= mlx_end)
+					if(addr >= mlx_init)// && addr <= mlx_end)
 					{
 						pthread_mutex_unlock(&malloc_mutex);
-						unlock_mutex_malloc();
 						free(strings);
+						unlock_mutex_malloc();
 						return Real__malloc(sz);
 					}
     			}

@@ -22,7 +22,7 @@ FOLDER=".malloc_tester"
 ##############################################################################################
 
 ##############################################################################################
-CURRENTVERSION="3.0.3"
+CURRENTVERSION="3.0.4"
 
 # github_url="https://github.com/kingcreek/42-Malloc_tester/raw/main/version.txt"
 # if ! curl -s -L "$github_url" | grep -q $CURRENTVERSION; then
@@ -227,24 +227,26 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
 fi
 
 # MLX, are you here?
+rm -f $MINILIB
 while true; do
-    nm_output=$(nm "$EJECUTABLE" | grep -E 'mlx_init|mlx_X_error')
+    nm_output=$(nm "$EJECUTABLE" | grep -E 'mlx_init')
 
     if [ -n "$nm_output" ]; then
-        echo -e "\x1B[31mMinilib has been detected in the program.\nDo you want to skip the segfaults/leaks from the library? (Yes/No): \x1B[0m"
+        echo -e "\x1B[31mMinilib has been detected in the program.\nDo you want to skip the segfaults/leaks from the library? (RECOMENDED) (Yes/No): \x1B[0m"
 
         read -p "" response
         response_lower=$(echo "$response" | tr '[:upper:]' '[:lower:]')
         
         if [ "$response_lower" == "yes" ] || [ "$response_lower" == "y" ]; then
             touch "$MINILIB"
-            echo "$nm_output" | awk '{print $1}' > "$MINILIB"
+            #echo "$nm_output" | awk '{print $1}' > "$MINILIB"
+			nm "$EJECUTABLE" | grep 'mlx_' | awk '{print $1}' | sort -n -k1,1 --field-separator=- | tail -n 1 > "$MINILIB"
+			nm "$EJECUTABLE" | grep 'mlx_' | awk '{print $1}' | sort -n -k1,1 --field-separator=- | head -n 1 >>  "$MINILIB"
             break
         elif [ "$response_lower" == "no" ] || [ "$response_lower" == "n" ]; then
             break
         else
             echo "Respuesta no válida. Por favor, introduce Yes/No."
-        fi
     else
         break
     fi
