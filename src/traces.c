@@ -82,6 +82,7 @@ void addr2line(const char *program_name, void const *const addr, char *file_path
 	int result = sscanf(program_name, "%[^+(]%*c%llx", p_name, &address);
 	if (result == 2)
 	{
+		//sprintf(addr2line_cmd, "addr2line -e  %s -f -C %#llx", p_name, address);
 		sprintf(addr2line_cmd, "addr2line -e  %s + %#llx", p_name, address);
 		write_in_file_simple(file_path, addr2line_cmd);
 	}
