@@ -22,7 +22,7 @@ FOLDER=".malloc_tester"
 ##############################################################################################
 
 ##############################################################################################
-CURRENTVERSION="3.0.4"
+CURRENTVERSION="3.0.5"
 
 # github_url="https://github.com/kingcreek/42-Malloc_tester/raw/main/version.txt"
 # if ! curl -s -L "$github_url" | grep -q $CURRENTVERSION; then
@@ -247,6 +247,7 @@ while true; do
             break
         else
             echo "Respuesta no válida. Por favor, introduce Yes/No."
+		fi
     else
         break
     fi
