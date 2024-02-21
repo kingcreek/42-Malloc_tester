@@ -22,7 +22,7 @@ FOLDER=".malloc_tester"
 ##############################################################################################
 
 ##############################################################################################
-CURRENTVERSION="3.0.0"
+CURRENTVERSION="3.0.1"
 
 # github_url="https://github.com/kingcreek/42-Malloc_tester/raw/main/version.txt"
 # if ! curl -s -L "$github_url" | grep -q $CURRENTVERSION; then
@@ -207,7 +207,8 @@ if [[ ! "$EXECUTABLE_PATH" =~ ^\./ ]]; then
     EXECUTABLE_PATH="./$EXECUTABLE_PATH"
 fi
 
-if nm -a "$EJECUTABLE" 2>&1 | grep -q _asan; then
+#if nm -a "$EJECUTABLE" 2>&1 | grep -q _asan; then
+if nm -a "$EJECUTABLE" 2>&1 | grep -qE '_asan|_lsan|_ubsan|_tsan|__ubsan|__tsan'; then
     echo -e "\n\x1B[31m Your program is compiled with the fsanitize flag, please recompile the program without that flag for correct functioning of the tester. \x1B[0m"
 	exit
 fi
