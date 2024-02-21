@@ -37,6 +37,10 @@ int end_program = 1;
 char program_name[512] = {0};
 int totalMallocs = 0;
 
+// MINILIBX
+unsigned long long mlx_init = 0;
+unsigned long long mlx_end = 0;
+
 pthread_mutex_t malloc_mutex;
 static void lock_mutex_malloc() { ignore_malloc = 1; }	 // Personality disorder
 static void unlock_mutex_malloc() { ignore_malloc = 0; } // His brother
@@ -130,10 +134,13 @@ __attribute__((constructor)) static void init()
 	atexit(program_finish);
 	const char *home_dir = getenv("HOME");
 	if (home_dir != NULL)
+	{
 		snprintf(file_path, sizeof(file_path), "%s/.malloc_tester/address.0x00", home_dir);
-
-	if (home_dir != NULL)
 		totalMallocs = read_int_from_file(file_path);
+
+		snprintf(file_path, sizeof(file_path), "%s/.malloc_tester/minilib", home_dir);
+		read_mlx_position(file_path, &mlx_end, &mlx_init);
+	}
 	ignore_malloc = 0;
 	malloc_counter = 0;
 	get_program_name(program_name, sizeof(program_name));
@@ -163,6 +170,31 @@ INTERPOSE_C(void *, malloc, (size_t sz), (sz)) // Magic
 			pthread_mutex_lock(&malloc_mutex);
 			if (strstr(strings[1], program_name) != NULL)
 			{
+				#ifdef __APPLE__
+				unsigned long long addr = 0;
+				if (mlx_init != 0)
+				{
+					addr = (unsigned long long)(callstack[1] - getSlide());
+					if(addr >= mlx_init && addr <= mlx_end)
+					{
+						pthread_mutex_unlock(&malloc_mutex);
+						unlock_mutex_malloc();
+						free(strings);
+						return Real__malloc(sz);
+					}
+				}
+				#else
+				unsigned long long addr = 0;
+				if (mlx_init != 0 && sscanf(strings[1], "./cub3D(+0x%llx)", &addr) == 1) {
+					if(addr >= mlx_init && addr <= mlx_end)
+					{
+						pthread_mutex_unlock(&malloc_mutex);
+						unlock_mutex_malloc();
+						free(strings);
+						return Real__malloc(sz);
+					}
+    			}
+				#endif
 				// char address_str[40];
 				// if (sscanf(strings[1], "%*[^+]+%[^)]", address_str) == 1)
 				//{

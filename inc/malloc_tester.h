@@ -54,5 +54,6 @@ int calculate_leaks();
 char *malloc_location(const char *program_name, void const *const addr);
 //void print_double_free(char **strings, void *stack_traces[], int size);
 intptr_t getSlide();
+void read_mlx_position(const char *filename, unsigned long long *mlx_end, unsigned long long *mlx_init);
 
 #endif

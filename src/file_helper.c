@@ -97,3 +97,23 @@ int read_int_from_file(const char *path)
 	fclose(file);
 	return i;
 }
+
+void read_mlx_position(const char *filename, unsigned long long *mlx_end, unsigned long long *mlx_init) {
+    FILE *archivo = fopen(filename, "r");
+    if (archivo == NULL) {
+        return;
+    }
+
+    // First line
+    if (fscanf(archivo, "%llx", mlx_end) != 1) {
+        fclose(archivo);
+        return;
+    }
+
+    // Second line
+    if (fscanf(archivo, "%llx", mlx_init) != 1) {
+        fclose(archivo);
+        return;
+    }
+    fclose(archivo);
+}

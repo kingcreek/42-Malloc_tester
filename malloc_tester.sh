@@ -22,7 +22,7 @@ FOLDER=".malloc_tester"
 ##############################################################################################
 
 ##############################################################################################
-CURRENTVERSION="3.0.2"
+CURRENTVERSION="3.0.3"
 
 # github_url="https://github.com/kingcreek/42-Malloc_tester/raw/main/version.txt"
 # if ! curl -s -L "$github_url" | grep -q $CURRENTVERSION; then
@@ -46,6 +46,7 @@ ADDRESSFILE=$HOME/$FOLDER/address.0x00
 TRACE_FILE="$HOME/$FOLDER/trace"
 LEAKS_FILE="$HOME/$FOLDER/leaks"
 NO_ALLOC="$HOME/$FOLDER/noalloc"
+MINILIB="$HOME/$FOLDER/minilib"
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
 	# LOCAL_LIBRARY_NAME="./malloc_tester.so"
@@ -225,6 +226,31 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
 	fi
 fi
 
+# MLX, are you here?
+while true; do
+    nm_output=$(nm "$EJECUTABLE" | grep -E 'mlx_init|mlx_X_error')
+
+    if [ -n "$nm_output" ]; then
+        echo -e "\x1B[31mMinilib has been detected in the program.\nDo you want to skip the segfaults/leaks from the library? (Yes/No): \x1B[0m"
+
+        read -p "" response
+        response_lower=$(echo "$response" | tr '[:upper:]' '[:lower:]')
+        
+        if [ "$response_lower" == "yes" ] || [ "$response_lower" == "y" ]; then
+            touch "$MINILIB"
+            echo "$nm_output" | awk '{print $1}' > "$MINILIB"
+            break
+        elif [ "$response_lower" == "no" ] || [ "$response_lower" == "n" ]; then
+            break
+        else
+            echo "Respuesta no válida. Por favor, introduce Yes/No."
+        fi
+    else
+        break
+    fi
+done
+
+
 echo "Launch $EXECUTABLE_PATH with lib injected..."
 
 ok_flag=99
@@ -322,6 +348,7 @@ rm -f $ADDRESSFILE
 rm -f $TRACE_FILE
 rm -f $LEAKS_FILE
 rm -f $NO_ALLOC
+rm -f $MINILIB
 
 echo -e "\n"
 
