@@ -22,7 +22,7 @@ FOLDER=".malloc_tester"
 ##############################################################################################
 
 ##############################################################################################
-CURRENTVERSION="3.0.7"
+CURRENTVERSION="3.0.8"
 
 # github_url="https://github.com/kingcreek/42-Malloc_tester/raw/main/version.txt"
 # if ! curl -s -L "$github_url" | grep -q $CURRENTVERSION; then
@@ -163,6 +163,7 @@ history -w "$HISTFILE"
 ##############################################################################################
 
 if [[ "$EXECUTABLE_PATH" == "cclean"* ]]; then
+  chmod +x ncdu
   ./ncdu
   exit 1
 fi
