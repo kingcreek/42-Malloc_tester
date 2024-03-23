@@ -22,7 +22,7 @@ FOLDER=".malloc_tester"
 ##############################################################################################
 
 ##############################################################################################
-CURRENTVERSION="3.0.5"
+CURRENTVERSION="3.0.6"
 
 # github_url="https://github.com/kingcreek/42-Malloc_tester/raw/main/version.txt"
 # if ! curl -s -L "$github_url" | grep -q $CURRENTVERSION; then
@@ -161,6 +161,11 @@ history -w "$HISTFILE"
 ##############################################################################################
 
 ##############################################################################################
+
+if [[ "$EXECUTABLE_PATH" == "cclean"* ]]; then
+  ncdu
+  exit 1
+fi
 
 if [[ "$EXECUTABLE_PATH" == "leaks "* ]]; then
   PROGRAM_NAME=$(echo "$EXECUTABLE_PATH" | cut -d' ' -f2)
